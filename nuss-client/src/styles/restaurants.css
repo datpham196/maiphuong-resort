@@ -1,0 +1,149 @@
+.restaurants-shell {
+  background: linear-gradient(135deg, #e8efea 0%, #e8efea 42%, #f7f4ec 58%, #f7f4ec 100%);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+.restaurants-page,
+.restaurant-detail-page {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 7.5rem 0 5rem;
+}
+
+.restaurants-hero {
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(36, 59, 62, 0.12);
+}
+
+.restaurants-hero .eyebrow {
+  margin: 0 0 0.55rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  color: var(--teal, var(--ocean));
+}
+
+.restaurants-hero h1 {
+  margin: 0 0 0.7rem;
+  font-family: var(--font-serif), "Noto Serif", serif;
+  font-size: clamp(2rem, 4vw, 2.85rem);
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.restaurants-hero p {
+  margin: 0;
+  max-width: 40rem;
+  line-height: 1.65;
+  color: var(--muted, #5c6b6e);
+}
+
+.restaurants-empty {
+  color: var(--muted, #5c6b6e);
+}
+
+.restaurants-list {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.restaurant-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 38%) minmax(0, 1fr);
+  gap: 0;
+  background: var(--paper, #fff);
+  border: 1px solid rgba(36, 59, 62, 0.1);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 10px 28px rgba(36, 59, 62, 0.06);
+}
+
+.restaurant-row-media {
+  display: block;
+  min-height: 200px;
+  background: linear-gradient(145deg, #d8e0da 0%, #c5d0c8 100%);
+  overflow: hidden;
+}
+
+.restaurant-row-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.restaurant-row-body {
+  padding: 1.35rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.restaurant-row-body h2 {
+  margin: 0 0 0.65rem;
+  font-family: var(--font-serif), "Noto Serif", serif;
+  font-size: clamp(1.4rem, 2.4vw, 1.85rem);
+  font-weight: 500;
+}
+
+.restaurant-row-body h2 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.restaurant-row-body p {
+  margin: 0 0 1rem;
+  line-height: 1.65;
+  color: var(--muted, #5c6b6e);
+}
+
+.restaurant-detail-back {
+  display: inline-flex;
+  margin-bottom: 1.25rem;
+  color: var(--ocean);
+  text-decoration: none;
+}
+
+.restaurant-detail-hero h1 {
+  margin: 0;
+  font-family: var(--font-serif), "Noto Serif", serif;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 500;
+}
+
+.restaurant-detail-lead {
+  margin: 0.85rem 0 0;
+  max-width: 40rem;
+  line-height: 1.65;
+  color: var(--muted, #5c6b6e);
+}
+
+.restaurant-document {
+  margin-top: 2rem;
+  padding: 0.25rem 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.restaurant-document .pb-page {
+  background: transparent;
+}
+
+@media (max-width: 800px) {
+  .restaurants-page,
+  .restaurant-detail-page {
+    padding: 6.5rem 0 4rem;
+  }
+
+  .restaurant-row {
+    grid-template-columns: 1fr;
+  }
+
+  .restaurant-row-media {
+    aspect-ratio: 16 / 10;
+    min-height: 0;
+  }
+}

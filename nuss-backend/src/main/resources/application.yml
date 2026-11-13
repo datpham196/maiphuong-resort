@@ -1,0 +1,69 @@
+spring:
+  application:
+    name: nuss-backend
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/nuss}
+    username: ${SPRING_DATASOURCE_USERNAME:nuss}
+    password: ${SPRING_DATASOURCE_PASSWORD:nuss}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  servlet:
+    multipart:
+      max-file-size: 8MB
+      max-request-size: 10MB
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+nuss:
+  cors:
+    allowed-origins: ${NUSS_CORS_ORIGINS:http://localhost:3000}
+  upload:
+    dir: ${NUSS_UPLOAD_DIR:uploads}
+  jwt:
+    secret: ${JWT_SECRET:change-me-to-a-long-random-secret-key-32b}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  admin:
+    bootstrap-username: ${ADMIN_BOOTSTRAP_USERNAME:admin}
+    bootstrap-password: ${ADMIN_BOOTSTRAP_PASSWORD:admin123}
+  onepms:
+    base-url: ${ONEPMS_BASE_URL:https://us-central1-neutron-pms.cloudfunctions.net}
+    secret-key: ${ONEPMS_SECRET_KEY:}
+    account: ${ONEPMS_ACCOUNT:}
+    hotel-id: ${ONEPMS_HOTEL_ID:LHr42guUNvCzeKu0R08y}
+    connect-timeout-ms: 10000
+    read-timeout-ms: 30000
+  mail:
+    from: ${MAIL_FROM:maiphuongresort@gmail.com}
+    from-name: ${MAIL_FROM_NAME:Mai Phuong Resort}
+    resort-to: ${MAIL_RESORT_TO:maiphuongresort@gmail.com}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    com.maiphuong.nuss: INFO

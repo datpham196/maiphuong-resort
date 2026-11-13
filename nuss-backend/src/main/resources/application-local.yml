@@ -1,0 +1,4 @@
+# Optional local profile overrides. Prefer environment variables / .env loaded by your shell.
+spring:
+  jpa:
+    show-sql: false

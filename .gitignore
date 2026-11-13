@@ -1,0 +1,26 @@
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+backend-run.log
+
+# Secrets — never commit
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Backend
+nuss-backend/target/
+nuss-backend/uploads/
+
+# Frontend
+nuss-client/node_modules/
+nuss-client/.next/
+nuss-client/out/
+nuss-client/.vercel/
+nuss-client/*.tsbuildinfo
