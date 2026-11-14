@@ -13,6 +13,8 @@ backend-run.log
 **/.env
 **/.env.local
 **/.env.*.local
+**/render-env.local.txt
+**/vercel-env.local.txt
 
 # Backend
 nuss-backend/target/

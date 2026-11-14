@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { PublicChrome } from "@/components/public-chrome";
 import { routing } from "@/i18n/routing";
 
 type Props = {
@@ -33,5 +34,9 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   setRequestLocale(locale);
 
-  return <NextIntlClientProvider>{children}</NextIntlClientProvider>;
+  return (
+    <NextIntlClientProvider>
+      <PublicChrome>{children}</PublicChrome>
+    </NextIntlClientProvider>
+  );
 }

@@ -1,0 +1,59 @@
+.cms-page-shell {
+  background: linear-gradient(135deg, #e8efea 0%, #e8efea 42%, #f7f4ec 58%, #f7f4ec 100%);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+.cms-page {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 7.5rem 0 5rem;
+}
+
+.cms-page-back {
+  display: inline-flex;
+  margin-bottom: 1.25rem;
+  color: var(--ocean);
+  text-decoration: none;
+}
+
+.cms-page-hero h1 {
+  margin: 0;
+  font-family: var(--font-serif), "Noto Serif", serif;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 500;
+}
+
+.cms-page-lead {
+  margin: 0.85rem 0 0;
+  max-width: 40rem;
+  line-height: 1.65;
+  color: var(--muted, #5c6b6e);
+}
+
+.cms-page-document {
+  margin-top: 2rem;
+  padding: 0.25rem 0;
+}
+
+.cms-page-document .pb-page {
+  background: transparent;
+}
+
+.cms-page-empty {
+  color: var(--muted, #5c6b6e);
+}
+
+.cms-page-eyebrow {
+  margin: 0 0 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  color: var(--teal, var(--ocean));
+}
+
+@media (max-width: 800px) {
+  .cms-page {
+    padding: 6.5rem 0 4rem;
+  }
+}

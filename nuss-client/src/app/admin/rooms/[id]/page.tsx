@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useNavRouter } from "@/hooks/use-nav-router";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useAdminToast } from "@/components/admin-toast";
 import {
@@ -30,7 +31,7 @@ function isAllowedImage(file: File) {
 
 export default function AdminRoomEditPage() {
   const params = useParams<{ id: string }>();
-  const router = useRouter();
+  const router = useNavRouter();
   const toast = useAdminToast();
   const roomId = params.id;
   const [room, setRoom] = useState<AdminRoomType | null>(null);

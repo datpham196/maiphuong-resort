@@ -44,6 +44,23 @@ export const BLOCK_DEFINITIONS: BlockDefinition[] = [
     },
   },
   {
+    type: "mediaText",
+    label: "Ảnh + Text",
+    category: "media",
+    defaultProps: {
+      text: "Đoạn giới thiệu bên cạnh ảnh…",
+      src: "",
+      alt: "",
+      imagePosition: "left",
+      gap: 24,
+      radius: 12,
+      fontSize: 16,
+      color: "#5c6b6e",
+      stackOnMobile: true,
+      margin: { top: 0, bottom: 16 },
+    },
+  },
+  {
     type: "imageGallery",
     label: "Image Gallery",
     category: "media",

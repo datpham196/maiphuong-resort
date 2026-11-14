@@ -14,6 +14,7 @@ public record ExperienceContentRequest(
 		String priceNote,
 		String conditions,
 		String seoTitle,
-		String seoDescription
+		String seoDescription,
+		Object documentDraft
 ) {
 }

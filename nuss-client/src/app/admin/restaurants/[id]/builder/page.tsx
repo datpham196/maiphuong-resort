@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useNavRouter } from "@/hooks/use-nav-router";
 import { Suspense } from "react";
 
 function RedirectInner() {
-  const router = useRouter();
+  const router = useNavRouter();
   const searchParams = useSearchParams();
   const locale = searchParams.get("locale") === "en" ? "en" : "vi";
 

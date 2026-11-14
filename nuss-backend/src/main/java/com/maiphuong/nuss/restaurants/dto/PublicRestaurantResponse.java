@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public record PublicRestaurantResponse(
 		UUID id,
+		String kind,
 		String slug,
 		String title,
 		String shortDescription,

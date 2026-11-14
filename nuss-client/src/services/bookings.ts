@@ -103,3 +103,80 @@ export function createBooking(body: CreateBookingPayload) {
     body,
   });
 }
+
+export type BookingLookupRoom = {
+  roomTypeId: string | null;
+  roomTitle: string | null;
+  roomNumber: string | null;
+  adult: number | null;
+  child: number | null;
+  breakfast: boolean | null;
+  lunch: boolean | null;
+  dinner: boolean | null;
+  rates: number[];
+};
+
+export type BookingLookupService = {
+  serviceId: string | null;
+  serviceName: string | null;
+  serviceType: string | null;
+  quantity: number | null;
+  unitPrice: number | null;
+  totalPrice: number | null;
+};
+
+export type BookingLookupPayment = {
+  paymentDate: string | null;
+  paymentMethodId: string | null;
+  paymentMethodName: string | null;
+  amount: number | null;
+  paymentStatus: string | null;
+  transactionId: string | null;
+};
+
+export type BookingLookupResponse = {
+  bookingId: string | null;
+  bookingReference: string | null;
+  bookingIds: string[];
+  cancellable: boolean;
+  name: string | null;
+  email: string | null;
+  phone: string | null;
+  arrivalDate: string | null;
+  departureDate: string | null;
+  bookingStatus: string | null;
+  idNumber: string | null;
+  idType: string | null;
+  address: string | null;
+  totalAmount: number | null;
+  totalPaid: number | null;
+  totalRemaining: number | null;
+  paymentStatus: string | null;
+  currency: string | null;
+  rooms: BookingLookupRoom[];
+  services: BookingLookupService[];
+  payments: BookingLookupPayment[];
+  created: string | null;
+  updated: string | null;
+  checkInTime: string | null;
+  checkOutTime: string | null;
+  notes: string | null;
+};
+
+export function lookupBooking(ref: string, locale?: string) {
+  const params = new URLSearchParams({ ref: ref.trim() });
+  if (locale) {
+    params.set("locale", locale);
+  }
+  return apiFetch<BookingLookupResponse>(`/api/bookings/lookup?${params.toString()}`);
+}
+
+export function cancelBooking(bookingReference: string, locale?: string) {
+  return apiFetch<BookingLookupResponse>("/api/bookings/cancel", {
+    method: "POST",
+    body: {
+      bookingReference: bookingReference.trim(),
+      locale,
+    },
+  });
+}

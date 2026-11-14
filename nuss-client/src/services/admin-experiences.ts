@@ -1,3 +1,4 @@
+import type { PageDocument } from "@/components/page-builder/types";
 import { apiFetch } from "@/services/api";
 import { getAdminToken } from "@/services/admin-rooms";
 
@@ -6,15 +7,10 @@ export type AdminExperienceContent = {
   slug: string | null;
   title: string | null;
   shortDescription: string | null;
-  description: string | null;
-  itinerary: string | null;
-  durationText: string | null;
-  priceAmount: number | null;
-  priceCurrency: string | null;
-  priceNote: string | null;
-  conditions: string | null;
   seoTitle: string | null;
   seoDescription: string | null;
+  documentDraft: PageDocument;
+  documentPublished: PageDocument | null;
   published: boolean;
   cmsStatus: string;
 };
@@ -39,15 +35,9 @@ export type ExperienceContentPayload = {
   slug?: string;
   title?: string;
   shortDescription?: string;
-  description?: string;
-  itinerary?: string;
-  durationText?: string;
-  priceAmount?: number | null;
-  priceCurrency?: string;
-  priceNote?: string;
-  conditions?: string;
   seoTitle?: string;
   seoDescription?: string;
+  documentDraft?: PageDocument;
 };
 
 export function listAdminExperiences() {
@@ -60,7 +50,7 @@ export function getAdminExperience(id: string) {
 
 export function createAdminExperience(payload: {
   group: string;
-  layout: string;
+  layout?: string;
   displayOrder?: number;
   locale?: string;
   content?: ExperienceContentPayload;
@@ -110,6 +100,26 @@ export function unpublishExperienceContent(id: string, locale: string) {
     method: "POST",
     token: getAdminToken(),
   });
+}
+
+export function uploadExperienceMedia(id: string, file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+  return apiFetch<{ url: string; storageKey: string }>(`/api/admin/experiences/${id}/media`, {
+    method: "POST",
+    token: getAdminToken(),
+    formData,
+  });
+}
+
+export function createExperiencePreviewToken(id: string, locale: string) {
+  return apiFetch<{ token: string; expiresInSeconds: number }>(
+    `/api/admin/experiences/${id}/preview-token?locale=${encodeURIComponent(locale)}`,
+    {
+      method: "POST",
+      token: getAdminToken(),
+    },
+  );
 }
 
 export function uploadExperienceImage(id: string, file: File, altText?: string, asCover = false) {

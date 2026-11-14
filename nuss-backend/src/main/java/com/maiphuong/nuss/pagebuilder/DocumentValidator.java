@@ -20,6 +20,7 @@ public class DocumentValidator {
 			"heading",
 			"text",
 			"image",
+			"mediaText",
 			"imageGallery",
 			"slider",
 			"video",
@@ -155,6 +156,14 @@ public class DocumentValidator {
 			case "image" -> {
 				if (blank(props, "src")) {
 					errors.add(error(path + ".props.src", "SRC_REQUIRED", "Image src is required"));
+				}
+			}
+			case "mediaText" -> {
+				if (blank(props, "src")) {
+					errors.add(error(path + ".props.src", "SRC_REQUIRED", "Media text image src is required"));
+				}
+				if (blank(props, "text")) {
+					errors.add(error(path + ".props.text", "TEXT_REQUIRED", "Media text content is required"));
 				}
 			}
 			case "button" -> {

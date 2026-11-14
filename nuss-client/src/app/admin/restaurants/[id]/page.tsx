@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useNavRouter } from "@/hooks/use-nav-router";
 
 /** Legacy meta URL — redirect to the single restaurant Page Builder. */
 export default function AdminRestaurantMetaRedirectPage() {
-  const router = useRouter();
+  const router = useNavRouter();
 
   useEffect(() => {
     router.replace("/admin/restaurants");

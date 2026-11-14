@@ -1,6 +1,7 @@
 package com.maiphuong.nuss.experiences.controller;
 
 import com.maiphuong.nuss.experiences.dto.PublicExperienceResponse;
+import com.maiphuong.nuss.experiences.service.ExperiencePreviewTokenService;
 import com.maiphuong.nuss.experiences.service.ExperienceQueryService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,9 +16,14 @@ import java.util.List;
 public class PublicExperienceController {
 
 	private final ExperienceQueryService experienceQueryService;
+	private final ExperiencePreviewTokenService previewTokenService;
 
-	public PublicExperienceController(ExperienceQueryService experienceQueryService) {
+	public PublicExperienceController(
+			ExperienceQueryService experienceQueryService,
+			ExperiencePreviewTokenService previewTokenService
+	) {
 		this.experienceQueryService = experienceQueryService;
+		this.previewTokenService = previewTokenService;
 	}
 
 	@GetMapping
@@ -26,6 +32,11 @@ public class PublicExperienceController {
 			@RequestParam(required = false) String group
 	) {
 		return experienceQueryService.list(locale, group);
+	}
+
+	@GetMapping("/preview")
+	public PublicExperienceResponse preview(@RequestParam String token) {
+		return experienceQueryService.getPreview(token, previewTokenService);
 	}
 
 	@GetMapping("/{slug}")

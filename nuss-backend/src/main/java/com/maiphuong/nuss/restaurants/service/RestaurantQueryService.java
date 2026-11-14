@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class RestaurantQueryService {
@@ -49,6 +50,7 @@ public class RestaurantQueryService {
 	private PublicRestaurantResponse toPublic(RestaurantContent content) {
 		return new PublicRestaurantResponse(
 				content.getRestaurant().getId(),
+				content.getRestaurant().getKind(),
 				content.getSlug(),
 				content.getTitle(),
 				content.getShortDescription(),
@@ -63,6 +65,7 @@ public class RestaurantQueryService {
 	private PublicRestaurantResponse toPreview(RestaurantContent content) {
 		return new PublicRestaurantResponse(
 				content.getRestaurant().getId(),
+				content.getRestaurant().getKind(),
 				content.getSlug(),
 				content.getTitle(),
 				content.getShortDescription(),
@@ -76,12 +79,12 @@ public class RestaurantQueryService {
 
 	private Object readJson(String raw) {
 		if (raw == null || raw.isBlank()) {
-			return objectMapper.createObjectNode();
+			return Map.of();
 		}
 		try {
 			return objectMapper.readValue(raw, Object.class);
 		} catch (Exception ex) {
-			return objectMapper.createObjectNode();
+			return Map.of();
 		}
 	}
 

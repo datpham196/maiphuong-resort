@@ -535,10 +535,10 @@
   grid-column: 1 / -1;
 }
 
-.admin-form-grid input,
+.admin-form-grid input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
 .admin-form-grid select,
 .admin-form-grid textarea,
-.admin-form input,
+.admin-form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
 .admin-form textarea {
   border: 1px solid var(--admin-line);
   border-radius: 10px;
@@ -551,6 +551,15 @@
   display: flex !important;
   align-items: center;
   gap: 0.5rem;
+  min-height: 2.6rem;
+}
+
+.admin-check input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--admin-primary, #0f766e);
 }
 
 .admin-image-grid {

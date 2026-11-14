@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavRouter } from "@/hooks/use-nav-router";
 import { useAdminToast } from "@/components/admin-toast";
 import {
   AdminRoomType,
@@ -15,7 +15,7 @@ import {
 } from "@/services/admin-rooms";
 
 export default function AdminRoomsPage() {
-  const router = useRouter();
+  const router = useNavRouter();
   const toast = useAdminToast();
   const [rooms, setRooms] = useState<AdminRoomType[]>([]);
   const [runs, setRuns] = useState<SyncRun[]>([]);

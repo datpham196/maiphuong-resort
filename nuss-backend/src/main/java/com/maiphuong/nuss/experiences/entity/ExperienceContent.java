@@ -9,6 +9,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -62,8 +64,20 @@ public class ExperienceContent {
 	@Column(name = "seo_description")
 	private String seoDescription;
 
+	@JdbcTypeCode(SqlTypes.JSON)
+	@Column(name = "document_draft", nullable = false, columnDefinition = "jsonb")
+	private String documentDraft =
+			"{\"version\":1,\"root\":{\"id\":\"root\",\"type\":\"root\",\"props\":{},\"children\":[]}}";
+
+	@JdbcTypeCode(SqlTypes.JSON)
+	@Column(name = "document_published", columnDefinition = "jsonb")
+	private String documentPublished;
+
 	@Column(name = "is_published", nullable = false)
 	private boolean published = false;
+
+	@Column(name = "published_at")
+	private Instant publishedAt;
 
 	@Column(name = "created_at", nullable = false)
 	private Instant createdAt;
@@ -202,11 +216,35 @@ public class ExperienceContent {
 		this.seoDescription = seoDescription;
 	}
 
+	public String getDocumentDraft() {
+		return documentDraft;
+	}
+
+	public void setDocumentDraft(String documentDraft) {
+		this.documentDraft = documentDraft;
+	}
+
+	public String getDocumentPublished() {
+		return documentPublished;
+	}
+
+	public void setDocumentPublished(String documentPublished) {
+		this.documentPublished = documentPublished;
+	}
+
 	public boolean isPublished() {
 		return published;
 	}
 
 	public void setPublished(boolean published) {
 		this.published = published;
+	}
+
+	public Instant getPublishedAt() {
+		return publishedAt;
+	}
+
+	public void setPublishedAt(Instant publishedAt) {
+		this.publishedAt = publishedAt;
 	}
 }

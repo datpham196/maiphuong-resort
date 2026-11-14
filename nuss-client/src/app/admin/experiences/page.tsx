@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useNavRouter } from "@/hooks/use-nav-router";
 import { FormEvent, useEffect, useState } from "react";
 import { useAdminToast } from "@/components/admin-toast";
 import {
@@ -17,21 +17,14 @@ const GROUP_LABEL: Record<string, string> = {
   ticket: "Vé",
 };
 
-const LAYOUT_LABEL: Record<string, string> = {
-  layout1: "Layout 1",
-  layout2: "Layout 2",
-  layout3: "Layout 3",
-};
-
 export default function AdminExperiencesPage() {
-  const router = useRouter();
+  const router = useNavRouter();
   const toast = useAdminToast();
   const [items, setItems] = useState<AdminExperience[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState({
     group: "destination",
-    layout: "layout1",
     title: "",
     slug: "",
   });
@@ -60,12 +53,6 @@ export default function AdminExperiencesPage() {
     void load();
   }, [router]);
 
-  function onGroupChange(group: string) {
-    const defaultLayout =
-      group === "tour" ? "layout2" : group === "ticket" ? "layout3" : "layout1";
-    setForm((current) => ({ ...current, group, layout: defaultLayout }));
-  }
-
   async function onCreate(event: FormEvent) {
     event.preventDefault();
     setCreating(true);
@@ -73,7 +60,6 @@ export default function AdminExperiencesPage() {
     try {
       const created = await createAdminExperience({
         group: form.group,
-        layout: form.layout,
         locale: "vi",
         content: {
           title: form.title,
@@ -96,7 +82,7 @@ export default function AdminExperiencesPage() {
       <div className="dash-head">
         <div>
           <h1>Điểm đến / tour / vé</h1>
-          <p>Tạo bài CMS, chọn nhóm và layout, rồi bổ sung ảnh trước khi publish.</p>
+          <p>Tạo bài theo nhóm, rồi mở Page Builder để dựng nội dung tùy thích.</p>
         </div>
       </div>
 
@@ -107,21 +93,13 @@ export default function AdminExperiencesPage() {
         <form className="admin-form-grid" onSubmit={(event) => void onCreate(event)}>
           <label>
             Nhóm
-            <select value={form.group} onChange={(event) => onGroupChange(event.target.value)}>
+            <select
+              value={form.group}
+              onChange={(event) => setForm((current) => ({ ...current, group: event.target.value }))}
+            >
               <option value="destination">Điểm đến</option>
               <option value="tour">Tour</option>
               <option value="ticket">Vé khu vui chơi</option>
-            </select>
-          </label>
-          <label>
-            Layout
-            <select
-              value={form.layout}
-              onChange={(event) => setForm((current) => ({ ...current, layout: event.target.value }))}
-            >
-              <option value="layout1">Layout 1</option>
-              <option value="layout2">Layout 2</option>
-              <option value="layout3">Layout 3</option>
             </select>
           </label>
           <label>
@@ -152,7 +130,6 @@ export default function AdminExperiencesPage() {
             <tr>
               <th>Tiêu đề (vi)</th>
               <th>Nhóm</th>
-              <th>Layout</th>
               <th>Active</th>
               <th>CMS vi</th>
               <th>CMS en</th>
@@ -167,7 +144,6 @@ export default function AdminExperiencesPage() {
                 <tr key={item.id}>
                   <td>{vi?.title ?? "—"}</td>
                   <td>{GROUP_LABEL[item.group] ?? item.group}</td>
-                  <td>{LAYOUT_LABEL[item.layout] ?? item.layout}</td>
                   <td>{item.active ? "Yes" : "No"}</td>
                   <td>{vi?.cmsStatus ?? "Missing"}</td>
                   <td>{en?.cmsStatus ?? "Missing"}</td>

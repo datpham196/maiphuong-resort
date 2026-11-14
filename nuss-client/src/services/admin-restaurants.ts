@@ -15,8 +15,11 @@ export type AdminRestaurantContent = {
   cmsStatus: string;
 };
 
+export type VenueKind = "restaurant" | "bar";
+
 export type AdminRestaurant = {
   id: string;
+  kind: VenueKind;
   displayOrder: number;
   active: boolean;
   coverImageUrl: string | null;
@@ -36,8 +39,11 @@ export function listAdminRestaurants() {
   return apiFetch<AdminRestaurant[]>("/api/admin/restaurants", { token: getAdminToken() });
 }
 
-export function getPrimaryAdminRestaurant() {
-  return apiFetch<AdminRestaurant>("/api/admin/restaurants/primary", { token: getAdminToken() });
+export function getPrimaryAdminRestaurant(kind: VenueKind = "restaurant") {
+  return apiFetch<AdminRestaurant>(
+    `/api/admin/restaurants/primary?kind=${encodeURIComponent(kind)}`,
+    { token: getAdminToken() },
+  );
 }
 
 export function getAdminRestaurant(id: string) {
@@ -47,6 +53,7 @@ export function getAdminRestaurant(id: string) {
 export function createAdminRestaurant(payload: {
   displayOrder?: number;
   locale?: string;
+  kind?: VenueKind;
   content?: RestaurantContentPayload;
 }) {
   return apiFetch<AdminRestaurant>("/api/admin/restaurants", {

@@ -1,14 +1,15 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { usePathname, useRouter } from "@/i18n/navigation";
+import { useI18nNavRouter } from "@/hooks/use-nav-router";
+import { usePathname } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
 export function LanguageSwitcher() {
   const t = useTranslations("Header");
   const locale = useLocale();
   const pathname = usePathname();
-  const router = useRouter();
+  const router = useI18nNavRouter();
 
   return (
     <div className="language-switcher" aria-label={t("language")}>

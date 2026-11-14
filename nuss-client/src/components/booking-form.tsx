@@ -3,7 +3,8 @@
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { BookingBar, type BookingSearchValues } from "@/components/booking-bar";
-import { Link, useRouter } from "@/i18n/navigation";
+import { useI18nNavRouter } from "@/hooks/use-nav-router";
+import { Link } from "@/i18n/navigation";
 import { MAX_PARTY_ADULTS, MAX_PARTY_CHILDREN, MAX_SELF_SERVE_ROOMS, planParty } from "@/lib/room-party";
 import { ApiError } from "@/services/api";
 import {
@@ -61,7 +62,7 @@ export function BookingForm({
 }: BookingFormProps) {
   const t = useTranslations("Booking");
   const locale = useLocale();
-  const router = useRouter();
+  const router = useI18nNavRouter();
 
   const [stay, setStay] = useState<BookingSearchValues>({
     checkIn: initialCheckIn,

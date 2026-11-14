@@ -1,22 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
+import { useNavRouter } from "@/hooks/use-nav-router";
+import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
+import { PageBuilderShell } from "@/components/page-builder/PageBuilderShell";
+import type { PageBuilderApi } from "@/components/page-builder/page-builder-api";
+import { emptyDocument, type PageDocument } from "@/components/page-builder/types";
 import { useAdminToast } from "@/components/admin-toast";
 import {
   AdminExperience,
+  createExperiencePreviewToken,
   deactivateAdminExperience,
   deleteExperienceImage,
   getAdminExperience,
   publishExperienceContent,
   saveExperienceContent,
-  unpublishExperienceContent,
   updateAdminExperience,
   uploadExperienceImage,
+  uploadExperienceMedia,
 } from "@/services/admin-experiences";
 import { clearAdminToken, getAdminToken } from "@/services/admin-rooms";
 import { getApiBase } from "@/services/api";
+import "@/styles/page-builder.css";
+import "@/styles/page-builder-admin.css";
 
 type LocaleTab = "vi" | "en";
 
@@ -28,43 +35,39 @@ function isAllowedImage(file: File) {
   return ALLOWED_IMAGE_EXT.test(file.name);
 }
 
+function asDocument(value: unknown): PageDocument {
+  if (!value || typeof value !== "object") return emptyDocument();
+  const doc = value as PageDocument;
+  if (!doc.root || doc.root.type !== "root") return emptyDocument();
+  return {
+    version: typeof doc.version === "number" ? doc.version : 1,
+    root: doc.root,
+  };
+}
+
 function mediaUrl(url: string) {
   return url.startsWith("http") ? url : `${getApiBase()}${url}`;
 }
 
-export default function AdminExperienceEditPage() {
+function AdminExperienceBuilderInner() {
   const params = useParams<{ id: string }>();
-  const router = useRouter();
+  const searchParams = useSearchParams();
+  const router = useNavRouter();
   const toast = useAdminToast();
   const experienceId = params.id;
+  const localeParam = searchParams.get("locale");
+  const locale: LocaleTab = localeParam === "en" ? "en" : "vi";
+
   const [item, setItem] = useState<AdminExperience | null>(null);
-  const [locale, setLocale] = useState<LocaleTab>("vi");
   const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [meta, setMeta] = useState({ group: "destination", layout: "layout1", displayOrder: "0", active: true });
+  const [savingMeta, setSavingMeta] = useState(false);
+  const [meta, setMeta] = useState({ group: "destination", displayOrder: "0", active: true });
 
   const content = useMemo(
     () => item?.contents.find((entry) => entry.locale === locale),
     [item, locale],
   );
   const coverImage = useMemo(() => item?.images.find((image) => image.cover) ?? null, [item]);
-  const galleryImages = useMemo(() => item?.images.filter((image) => !image.cover) ?? [], [item]);
-  const coverUploadDisabled = saving || coverImage != null;
-
-  const [form, setForm] = useState({
-    title: "",
-    slug: "",
-    shortDescription: "",
-    description: "",
-    itinerary: "",
-    durationText: "",
-    priceAmount: "",
-    priceCurrency: "VND",
-    priceNote: "",
-    conditions: "",
-    seoTitle: "",
-    seoDescription: "",
-  });
 
   async function load() {
     try {
@@ -72,8 +75,7 @@ export default function AdminExperienceEditPage() {
       setItem(data);
       setMeta({
         group: data.group,
-        layout: data.layout,
-        displayOrder: String(data.displayOrder ?? 0),
+        displayOrder: String(data.displayOrder),
         active: data.active,
       });
       setError(null);
@@ -96,123 +98,30 @@ export default function AdminExperienceEditPage() {
     }
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [experienceId, router]);
-
-  useEffect(() => {
-    if (!content) {
-      setForm({
-        title: "",
-        slug: "",
-        shortDescription: "",
-        description: "",
-        itinerary: "",
-        durationText: "",
-        priceAmount: "",
-        priceCurrency: "VND",
-        priceNote: "",
-        conditions: "",
-        seoTitle: "",
-        seoDescription: "",
-      });
-      return;
-    }
-    setForm({
-      title: content.title ?? "",
-      slug: content.slug ?? "",
-      shortDescription: content.shortDescription ?? "",
-      description: content.description ?? "",
-      itinerary: content.itinerary ?? "",
-      durationText: content.durationText ?? "",
-      priceAmount: content.priceAmount != null ? String(content.priceAmount) : "",
-      priceCurrency: content.priceCurrency ?? "VND",
-      priceNote: content.priceNote ?? "",
-      conditions: content.conditions ?? "",
-      seoTitle: content.seoTitle ?? "",
-      seoDescription: content.seoDescription ?? "",
-    });
-  }, [content]);
-
-  function contentPayload() {
-    return {
-      title: form.title,
-      slug: form.slug,
-      shortDescription: form.shortDescription,
-      description: form.description,
-      itinerary: form.itinerary,
-      durationText: form.durationText,
-      priceAmount: form.priceAmount === "" ? null : Number(form.priceAmount),
-      priceCurrency: form.priceCurrency,
-      priceNote: form.priceNote,
-      conditions: form.conditions,
-      seoTitle: form.seoTitle,
-      seoDescription: form.seoDescription,
-    };
-  }
+  }, [experienceId, router, locale]);
 
   async function onSaveMeta(event: FormEvent) {
     event.preventDefault();
-    setSaving(true);
-    setError(null);
+    setSavingMeta(true);
     try {
       const updated = await updateAdminExperience(experienceId, {
         group: meta.group,
-        layout: meta.layout,
         displayOrder: Number(meta.displayOrder) || 0,
         active: meta.active,
       });
       setItem(updated);
-      toast.success("Đã lưu nhóm / layout");
+      toast.success("Đã lưu nhóm / trạng thái");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Save failed";
-      setError(message);
       toast.error(message);
     } finally {
-      setSaving(false);
-    }
-  }
-
-  async function onSave(event: FormEvent) {
-    event.preventDefault();
-    setSaving(true);
-    setError(null);
-    try {
-      const updated = await saveExperienceContent(experienceId, locale, contentPayload());
-      setItem(updated);
-      toast.success(`Đã lưu nháp (${locale.toUpperCase()})`);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Save failed";
-      setError(message);
-      toast.error(message);
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function onPublish(publish: boolean) {
-    setSaving(true);
-    setError(null);
-    try {
-      await saveExperienceContent(experienceId, locale, contentPayload());
-      const updated = publish
-        ? await publishExperienceContent(experienceId, locale)
-        : await unpublishExperienceContent(experienceId, locale);
-      setItem(updated);
-      toast.success(publish ? `Đã publish (${locale.toUpperCase()})` : `Đã unpublish (${locale.toUpperCase()})`);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Publish failed";
-      setError(message);
-      toast.error(message);
-    } finally {
-      setSaving(false);
+      setSavingMeta(false);
     }
   }
 
   async function onUploadCover(files: File[]) {
     const file = files[0] ?? null;
-    if (!file) {
-      toast.error("Không nhận được file ảnh. Hãy chọn lại.");
-      return;
-    }
+    if (!file) return;
     if (coverImage) {
       toast.error("Đã có ảnh cover. Hãy xóa ảnh hiện tại trước khi upload ảnh khác.");
       return;
@@ -221,68 +130,37 @@ export default function AdminExperienceEditPage() {
       toast.error("Chỉ chấp nhận JPEG, PNG hoặc WebP");
       return;
     }
-    setSaving(true);
-    setError(null);
+    setSavingMeta(true);
     try {
       await uploadExperienceImage(experienceId, file, undefined, true);
       await load();
       toast.success("Đã upload ảnh cover");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Upload failed";
-      setError(message);
       toast.error(message);
     } finally {
-      setSaving(false);
+      setSavingMeta(false);
     }
   }
 
-  async function onUploadGallery(files: File[]) {
-    if (files.length === 0) {
-      toast.error("Không nhận được file ảnh. Hãy chọn lại.");
-      return;
-    }
-    const invalid = files.filter((file) => !isAllowedImage(file));
-    if (invalid.length > 0) {
-      toast.error("Chỉ chấp nhận JPEG, PNG hoặc WebP");
-      return;
-    }
-    setSaving(true);
-    setError(null);
+  async function onDeleteCover() {
+    if (!coverImage) return;
+    setSavingMeta(true);
     try {
-      for (const file of files) {
-        await uploadExperienceImage(experienceId, file, undefined, false);
-      }
+      await deleteExperienceImage(experienceId, coverImage.id);
       await load();
-      toast.success(files.length === 1 ? "Đã thêm 1 ảnh gallery" : `Đã thêm ${files.length} ảnh gallery`);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Upload failed";
-      setError(message);
-      toast.error(message);
-      await load();
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function onDeleteImage(imageId: string, label: string) {
-    setSaving(true);
-    setError(null);
-    try {
-      await deleteExperienceImage(experienceId, imageId);
-      await load();
-      toast.success(`Đã xóa ${label}`);
+      toast.success("Đã xóa ảnh cover");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Delete failed";
-      setError(message);
       toast.error(message);
     } finally {
-      setSaving(false);
+      setSavingMeta(false);
     }
   }
 
   async function onDeactivate() {
     if (!window.confirm("Ẩn bài này khỏi danh sách công khai?")) return;
-    setSaving(true);
+    setSavingMeta(true);
     try {
       await deactivateAdminExperience(experienceId);
       toast.success("Đã ẩn bài");
@@ -291,39 +169,76 @@ export default function AdminExperienceEditPage() {
       const message = err instanceof Error ? err.message : "Deactivate failed";
       toast.error(message);
     } finally {
-      setSaving(false);
+      setSavingMeta(false);
     }
+  }
+
+  const builderApi: PageBuilderApi = {
+    saveContent: (loc, payload) => saveExperienceContent(experienceId, loc, payload),
+    publishContent: (loc) => publishExperienceContent(experienceId, loc),
+    createPreviewToken: (loc) => createExperiencePreviewToken(experienceId, loc),
+    uploadMedia: (file) => uploadExperienceMedia(experienceId, file),
+    previewPath: (loc, token) => `/${loc}/experiences/preview?token=${encodeURIComponent(token)}`,
+  };
+
+  if (error) {
+    return (
+      <div className="dash">
+        <p className="admin-error">{error}</p>
+      </div>
+    );
   }
 
   if (!item) {
     return (
       <div className="dash">
-        <p>{error ?? "Đang tải…"}</p>
+        <p className="admin-muted">Đang mở bài experiences…</p>
       </div>
     );
   }
 
   return (
-    <div className="dash">
-      <div className="dash-head">
+    <div className="dash pb-admin-page">
+      <div className="dash-head" style={{ marginBottom: "0.75rem" }}>
         <div>
           <p className="admin-muted" style={{ margin: 0 }}>
             <Link href="/admin/experiences">← Danh sách</Link>
           </p>
           <h1>{content?.title ?? "Sửa bài experiences"}</h1>
-          <p>
-            Status {locale.toUpperCase()}: <strong>{content?.cmsStatus ?? "Missing"}</strong>
-          </p>
+          <p>Dùng Page Builder để dựng nội dung trang chi tiết theo ý.</p>
         </div>
-        <button type="button" className="admin-logout" onClick={() => void onDeactivate()} disabled={saving}>
-          Ẩn bài
-        </button>
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
+          {(["vi", "en"] as LocaleTab[]).map((tab) => {
+            const status = item.contents.find((c) => c.locale === tab)?.cmsStatus;
+            return (
+              <Link
+                key={tab}
+                className={`admin-btn${locale === tab ? " is-primary" : " is-secondary"}`}
+                href={`/admin/experiences/${experienceId}?locale=${tab}`}
+              >
+                {tab.toUpperCase()}
+                {status ? ` · ${status}` : ""}
+              </Link>
+            );
+          })}
+          {content?.slug ? (
+            <a
+              className="admin-btn"
+              href={`/${locale}/experiences/${content.slug}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Xem trang public
+            </a>
+          ) : null}
+          <button type="button" className="admin-logout" onClick={() => void onDeactivate()} disabled={savingMeta}>
+            Ẩn bài
+          </button>
+        </div>
       </div>
 
-      {error ? <p className="admin-error">{error}</p> : null}
-
       <section className="dash-panel" style={{ marginBottom: "1rem" }}>
-        <h2 style={{ marginTop: 0 }}>Nhóm & layout</h2>
+        <h2 style={{ marginTop: 0 }}>Nhóm & ảnh cover (list)</h2>
         <form className="admin-form-grid" onSubmit={(event) => void onSaveMeta(event)}>
           <label>
             Nhóm
@@ -334,17 +249,6 @@ export default function AdminExperienceEditPage() {
               <option value="destination">Điểm đến</option>
               <option value="tour">Tour</option>
               <option value="ticket">Vé</option>
-            </select>
-          </label>
-          <label>
-            Layout
-            <select
-              value={meta.layout}
-              onChange={(event) => setMeta((current) => ({ ...current, layout: event.target.value }))}
-            >
-              <option value="layout1">Layout 1</option>
-              <option value="layout2">Layout 2</option>
-              <option value="layout3">Layout 3</option>
             </select>
           </label>
           <label>
@@ -362,229 +266,86 @@ export default function AdminExperienceEditPage() {
             />
             Active
           </label>
-          <button type="submit" className="dash-primary" disabled={saving}>
-            Lưu nhóm / layout
-          </button>
-        </form>
-      </section>
-
-      <div className="admin-tabs" style={{ marginBottom: "1rem" }}>
-        {(["vi", "en"] as const).map((tab) => (
-          <button
-            key={tab}
-            type="button"
-            className={locale === tab ? "is-active" : undefined}
-            onClick={() => setLocale(tab)}
-          >
-            {tab.toUpperCase()}
-          </button>
-        ))}
-      </div>
-
-      <section className="dash-panel" style={{ marginBottom: "1rem" }}>
-        <form className="admin-form-grid" onSubmit={(event) => void onSave(event)}>
-          <label>
-            Title
-            <input
-              value={form.title}
-              onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
-            />
-          </label>
-          <label>
-            Slug
-            <input
-              value={form.slug}
-              onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))}
-            />
-          </label>
-          <label className="admin-span-2">
-            Short description
-            <textarea
-              rows={2}
-              value={form.shortDescription}
-              onChange={(event) => setForm((current) => ({ ...current, shortDescription: event.target.value }))}
-            />
-          </label>
-          <label className="admin-span-2">
-            Description
-            <textarea
-              rows={5}
-              value={form.description}
-              onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
-            />
-          </label>
-          <label className="admin-span-2">
-            Itinerary
-            <textarea
-              rows={4}
-              value={form.itinerary}
-              onChange={(event) => setForm((current) => ({ ...current, itinerary: event.target.value }))}
-            />
-          </label>
-          <label>
-            Duration
-            <input
-              value={form.durationText}
-              onChange={(event) => setForm((current) => ({ ...current, durationText: event.target.value }))}
-            />
-          </label>
-          <label>
-            Price
-            <input
-              value={form.priceAmount}
-              onChange={(event) => setForm((current) => ({ ...current, priceAmount: event.target.value }))}
-            />
-          </label>
-          <label>
-            Currency
-            <input
-              value={form.priceCurrency}
-              onChange={(event) => setForm((current) => ({ ...current, priceCurrency: event.target.value }))}
-            />
-          </label>
-          <label>
-            Price note
-            <input
-              value={form.priceNote}
-              onChange={(event) => setForm((current) => ({ ...current, priceNote: event.target.value }))}
-            />
-          </label>
-          <label className="admin-span-2">
-            Conditions
-            <textarea
-              rows={3}
-              value={form.conditions}
-              onChange={(event) => setForm((current) => ({ ...current, conditions: event.target.value }))}
-            />
-          </label>
-          <label>
-            SEO title
-            <input
-              value={form.seoTitle}
-              onChange={(event) => setForm((current) => ({ ...current, seoTitle: event.target.value }))}
-            />
-          </label>
-          <label>
-            SEO description
-            <input
-              value={form.seoDescription}
-              onChange={(event) => setForm((current) => ({ ...current, seoDescription: event.target.value }))}
-            />
-          </label>
           <div className="admin-actions admin-span-2">
-            <button type="submit" className="dash-primary" disabled={saving}>
-              Lưu nháp
-            </button>
-            <button type="button" onClick={() => void onPublish(true)} disabled={saving}>
-              Publish
-            </button>
-            <button type="button" onClick={() => void onPublish(false)} disabled={saving}>
-              Unpublish
+            <button type="submit" className="dash-primary" disabled={savingMeta}>
+              Lưu nhóm / trạng thái
             </button>
           </div>
         </form>
-      </section>
 
-      <section className="dash-panel admin-media-block">
-        <div className="admin-media-head">
-          <h2>Ảnh chính (cover)</h2>
-          <p className="admin-muted">Hiện trên danh sách experiences. Chỉ 1 ảnh — có cover rồi phải xóa mới upload được.</p>
-        </div>
-        <div className="admin-actions">
-          {coverUploadDisabled ? (
-            <button
-              type="button"
-              className="dash-primary"
-              disabled={saving}
-              onClick={() =>
-                toast.error("Đã có ảnh cover. Hãy xóa ảnh hiện tại trước khi upload ảnh khác.")
-              }
-            >
-              Upload ảnh cover
-            </button>
-          ) : (
-            <label className={`admin-upload-btn ${saving ? "is-disabled" : ""}`}>
-              {saving ? "Đang upload…" : "Upload ảnh cover"}
-              <input
-                className="admin-file-input"
-                type="file"
-                accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp"
-                disabled={saving}
-                onChange={(e) => {
-                  const files = e.target.files ? Array.from(e.target.files) : [];
-                  e.target.value = "";
-                  void onUploadCover(files);
-                }}
-              />
-            </label>
-          )}
-        </div>
-        {coverImage ? (
-          <figure className="admin-cover-preview">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={mediaUrl(coverImage.url)} alt={coverImage.altText ?? content?.title ?? ""} />
-            <figcaption>
-              <span className="dash-badge is-published">Cover</span>
+        <div className="admin-media-block" style={{ marginTop: "1rem" }}>
+          <div className="admin-media-head">
+            <h3 style={{ margin: 0 }}>Ảnh cover list</h3>
+            <p className="admin-muted">Ảnh hiển thị trên danh sách `/experiences`. Nội dung trang chi tiết dựng bằng Page Builder.</p>
+          </div>
+          <div className="admin-actions">
+            {coverImage ? (
               <button
                 type="button"
-                className="admin-secondary"
-                disabled={saving}
-                onClick={() => void onDeleteImage(coverImage.id, "ảnh cover")}
+                className="dash-primary"
+                disabled={savingMeta}
+                onClick={() => toast.error("Đã có ảnh cover. Hãy xóa ảnh hiện tại trước khi upload ảnh khác.")}
               >
-                Xóa
+                Upload ảnh cover
               </button>
-            </figcaption>
-          </figure>
-        ) : (
-          <p className="admin-muted">Chưa có ảnh cover.</p>
-        )}
-        {coverImage ? (
-          <p className="admin-hint">Upload đang bị khóa vì đã có cover. Xóa cover hiện tại để chọn ảnh khác.</p>
-        ) : null}
-      </section>
-
-      <section className="dash-panel admin-media-block">
-        <div className="admin-media-head">
-          <h2>Gallery (trang chi tiết)</h2>
-          <p className="admin-muted">Có thể chọn nhiều ảnh cùng lúc cho trang detail.</p>
-        </div>
-        <div className="admin-actions">
-          <label className={`admin-upload-btn ${saving ? "is-disabled" : ""}`}>
-            {saving ? "Đang upload…" : "Thêm ảnh gallery"}
-            <input
-              className="admin-file-input"
-              type="file"
-              accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp"
-              multiple
-              disabled={saving}
-              onChange={(e) => {
-                const files = e.target.files ? Array.from(e.target.files) : [];
-                e.target.value = "";
-                void onUploadGallery(files);
-              }}
-            />
-          </label>
-        </div>
-        <div className="admin-gallery">
-          {galleryImages.map((image) => (
-            <figure key={image.id}>
+            ) : (
+              <label className={`admin-upload-btn ${savingMeta ? "is-disabled" : ""}`}>
+                {savingMeta ? "Đang upload…" : "Upload ảnh cover"}
+                <input
+                  className="admin-file-input"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp"
+                  disabled={savingMeta}
+                  onChange={(e) => {
+                    const files = e.target.files ? Array.from(e.target.files) : [];
+                    e.target.value = "";
+                    void onUploadCover(files);
+                  }}
+                />
+              </label>
+            )}
+          </div>
+          {coverImage ? (
+            <figure className="admin-cover-preview">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={mediaUrl(image.url)} alt={image.altText ?? content?.title ?? ""} />
+              <img src={mediaUrl(coverImage.url)} alt={coverImage.altText ?? ""} />
               <figcaption>
-                <button
-                  type="button"
-                  className="admin-secondary"
-                  disabled={saving}
-                  onClick={() => void onDeleteImage(image.id, "ảnh gallery")}
-                >
+                <span className="dash-badge is-published">Cover</span>
+                <button type="button" className="admin-secondary" disabled={savingMeta} onClick={() => void onDeleteCover()}>
                   Xóa
                 </button>
               </figcaption>
             </figure>
-          ))}
+          ) : (
+            <p className="admin-muted">Chưa có ảnh cover.</p>
+          )}
         </div>
-        {galleryImages.length === 0 ? <p className="admin-muted">Chưa có ảnh gallery.</p> : null}
       </section>
+
+      <PageBuilderShell
+        key={`${item.id}-${locale}`}
+        locale={locale}
+        title={content?.title ?? ""}
+        slug={content?.slug ?? ""}
+        shortDescription={content?.shortDescription ?? ""}
+        initialDocument={asDocument(content?.documentDraft)}
+        api={builderApi}
+        onSaved={() => void load()}
+      />
     </div>
+  );
+}
+
+export default function AdminExperienceEditPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="dash">
+          <p className="admin-muted">Đang mở bài experiences…</p>
+        </div>
+      }
+    >
+      <AdminExperienceBuilderInner />
+    </Suspense>
   );
 }

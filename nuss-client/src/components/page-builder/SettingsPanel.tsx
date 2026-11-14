@@ -3,15 +3,13 @@
 import { BLOCK_REGISTRY } from "@/components/page-builder/registry";
 import { resolveMediaUrl } from "@/components/page-builder/media";
 import type { BlockNode } from "@/components/page-builder/types";
-import { uploadRestaurantMedia } from "@/services/admin-restaurants";
-
 type Props = {
   node: BlockNode | null;
-  restaurantId: string;
+  uploadMedia: (file: File) => Promise<{ url: string }>;
   onChange: (props: Record<string, unknown>) => void;
 };
 
-export function SettingsPanel({ node, restaurantId, onChange }: Props) {
+export function SettingsPanel({ node, uploadMedia, onChange }: Props) {
   if (!node || node.type === "root" || node.type === "column") {
     return (
       <aside className="pb-settings">
@@ -26,7 +24,7 @@ export function SettingsPanel({ node, restaurantId, onChange }: Props) {
 
   async function onPickImage(field: string, file: File | null) {
     if (!file) return;
-    const uploaded = await uploadRestaurantMedia(restaurantId, file);
+    const uploaded = await uploadMedia(file);
     onChange({ [field]: uploaded.url });
   }
 
@@ -34,7 +32,7 @@ export function SettingsPanel({ node, restaurantId, onChange }: Props) {
     <aside className="pb-settings">
       <h3>{def?.label ?? node.type}</h3>
       <div className="pb-settings-form">
-        {"text" in props || node.type === "heading" || node.type === "text" ? (
+        {"text" in props || node.type === "heading" || node.type === "text" || node.type === "mediaText" ? (
           <label>
             Nội dung
             <textarea
@@ -59,7 +57,7 @@ export function SettingsPanel({ node, restaurantId, onChange }: Props) {
           </label>
         ) : null}
 
-        {node.type === "text" ? (
+        {node.type === "text" || node.type === "mediaText" ? (
           <label>
             Cỡ chữ (px)
             <input
@@ -95,16 +93,31 @@ export function SettingsPanel({ node, restaurantId, onChange }: Props) {
           </label>
         ) : null}
 
-        {node.type === "image" ? (
+        {node.type === "image" || node.type === "mediaText" ? (
           <>
-            <label>
-              Ảnh
-              <input
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                onChange={(e) => void onPickImage("src", e.target.files?.[0] ?? null)}
-              />
-            </label>
+            <div className="pb-slide-panel">
+              <div className="pb-slide-panel-head">
+                <strong>Ảnh</strong>
+                <span>{props.src ? "Đã có ảnh" : "Chưa chọn"}</span>
+              </div>
+              {resolveMediaUrl(String(props.src ?? "")) ? (
+                <div className="pb-slide-thumb" style={{ width: "100%", height: 140, marginBottom: "0.65rem" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={resolveMediaUrl(String(props.src ?? "")) ?? undefined} alt="" />
+                </div>
+              ) : null}
+              <label className="pb-file-button">
+                <span>{props.src ? "Đổi ảnh" : "Chọn ảnh"}</span>
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  onChange={(e) => {
+                    void onPickImage("src", e.target.files?.[0] ?? null);
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+            </div>
             <label>
               Alt
               <input value={String(props.alt ?? "")} onChange={(e) => onChange({ alt: e.target.value })} />
@@ -116,6 +129,37 @@ export function SettingsPanel({ node, restaurantId, onChange }: Props) {
                 value={Number(props.radius ?? 12)}
                 onChange={(e) => onChange({ radius: Number(e.target.value) })}
               />
+            </label>
+          </>
+        ) : null}
+
+        {node.type === "mediaText" ? (
+          <>
+            <label>
+              Vị trí ảnh
+              <select
+                value={String(props.imagePosition ?? "left")}
+                onChange={(e) => onChange({ imagePosition: e.target.value })}
+              >
+                <option value="left">Ảnh trái · Text phải</option>
+                <option value="right">Text trái · Ảnh phải</option>
+              </select>
+            </label>
+            <label>
+              Khoảng cách (px)
+              <input
+                type="number"
+                value={Number(props.gap ?? 24)}
+                onChange={(e) => onChange({ gap: Number(e.target.value) })}
+              />
+            </label>
+            <label className="pb-check">
+              <input
+                type="checkbox"
+                checked={props.stackOnMobile !== false}
+                onChange={(e) => onChange({ stackOnMobile: e.target.checked })}
+              />
+              Xếp dọc trên mobile
             </label>
           </>
         ) : null}
@@ -242,7 +286,7 @@ export function SettingsPanel({ node, restaurantId, onChange }: Props) {
             images={(Array.isArray(props.images) ? props.images : []) as { src?: string; alt?: string }[]}
             columns={Number(props.columns ?? 3)}
             gap={Number(props.gap ?? 12)}
-            restaurantId={restaurantId}
+            uploadMedia={uploadMedia}
             onChange={onChange}
           />
         ) : null}
@@ -259,7 +303,7 @@ export function SettingsPanel({ node, restaurantId, onChange }: Props) {
             autoplay={props.autoplay !== false}
             intervalMs={Number(props.intervalMs ?? 3000)}
             showDots={props.showDots !== false}
-            restaurantId={restaurantId}
+            uploadMedia={uploadMedia}
             onChange={onChange}
           />
         ) : null}
@@ -306,18 +350,18 @@ function GalleryEditor({
   images,
   columns,
   gap,
-  restaurantId,
+  uploadMedia,
   onChange,
 }: {
   images: { src?: string; alt?: string }[];
   columns: number;
   gap: number;
-  restaurantId: string;
+  uploadMedia: (file: File) => Promise<{ url: string }>;
   onChange: (props: Record<string, unknown>) => void;
 }) {
   async function addImage(file: File | null) {
     if (!file) return;
-    const uploaded = await uploadRestaurantMedia(restaurantId, file);
+    const uploaded = await uploadMedia(file);
     onChange({ images: [...images, { src: uploaded.url, alt: "" }] });
   }
 
@@ -419,19 +463,19 @@ function SliderEditor({
   autoplay,
   intervalMs,
   showDots,
-  restaurantId,
+  uploadMedia,
   onChange,
 }: {
   slides: { src?: string; alt?: string; caption?: string }[];
   autoplay: boolean;
   intervalMs: number;
   showDots: boolean;
-  restaurantId: string;
+  uploadMedia: (file: File) => Promise<{ url: string }>;
   onChange: (props: Record<string, unknown>) => void;
 }) {
   async function addSlide(file: File | null) {
     if (!file) return;
-    const uploaded = await uploadRestaurantMedia(restaurantId, file);
+    const uploaded = await uploadMedia(file);
     onChange({ slides: [...slides, { src: uploaded.url, alt: "", caption: "" }] });
   }
 
@@ -508,15 +552,15 @@ function SliderEditor({
                     <label>
                       <span>Chú thích</span>
                       <input
-                        placeholder="Caption…"
+                        placeholder="Tiêu đề slide…"
                         value={slide.caption ?? ""}
                         onChange={(e) => updateSlide(index, { caption: e.target.value })}
                       />
                     </label>
                     <label>
-                      <span>Alt</span>
+                      <span>Nội dung</span>
                       <input
-                        placeholder="Mô tả ảnh"
+                        placeholder="Mô tả ngắn dưới chú thích…"
                         value={slide.alt ?? ""}
                         onChange={(e) => updateSlide(index, { alt: e.target.value })}
                       />

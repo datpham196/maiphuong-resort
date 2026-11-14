@@ -1,8 +1,11 @@
 import { apiFetch } from "@/services/api";
 import type { PageDocument } from "@/components/page-builder/types";
 
+export type VenueKind = "restaurant" | "bar";
+
 export type PublicRestaurant = {
   id: string;
+  kind: VenueKind;
   slug: string;
   title: string;
   shortDescription: string | null;

@@ -3,16 +3,20 @@ package com.maiphuong.nuss.bookings.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maiphuong.nuss.bookings.RoomPartyAllocator;
 import com.maiphuong.nuss.bookings.dto.BookingItemRequest;
+import com.maiphuong.nuss.bookings.dto.BookingLookupResponse;
+import com.maiphuong.nuss.bookings.dto.CancelBookingRequest;
 import com.maiphuong.nuss.bookings.dto.CreateBookingRequest;
 import com.maiphuong.nuss.bookings.dto.CreateBookingResponse;
 import com.maiphuong.nuss.bookings.entity.BookingRequest;
 import com.maiphuong.nuss.bookings.repository.BookingRequestRepository;
 import com.maiphuong.nuss.pms.OnePmsClient;
 import com.maiphuong.nuss.pms.dto.OnePmsAvailabilityItem;
+import com.maiphuong.nuss.pms.dto.OnePmsBookingDetails;
 import com.maiphuong.nuss.pms.dto.OnePmsBookingResult;
 import com.maiphuong.nuss.rooms.entity.RoomContent;
 import com.maiphuong.nuss.rooms.entity.RoomType;
 import com.maiphuong.nuss.rooms.repository.RoomContentRepository;
+import com.maiphuong.nuss.rooms.repository.RoomTypeRepository;
 import com.maiphuong.nuss.rooms.service.RoomAvailabilityService;
 import com.maiphuong.nuss.shared.api.ApiException;
 import com.maiphuong.nuss.shared.config.NussProperties;
@@ -38,6 +42,7 @@ public class BookingService {
 
 	private final BookingRequestRepository bookingRequestRepository;
 	private final RoomContentRepository roomContentRepository;
+	private final RoomTypeRepository roomTypeRepository;
 	private final RoomAvailabilityService roomAvailabilityService;
 	private final OnePmsClient onePmsClient;
 	private final NussProperties properties;
@@ -47,6 +52,7 @@ public class BookingService {
 	public BookingService(
 			BookingRequestRepository bookingRequestRepository,
 			RoomContentRepository roomContentRepository,
+			RoomTypeRepository roomTypeRepository,
 			RoomAvailabilityService roomAvailabilityService,
 			OnePmsClient onePmsClient,
 			NussProperties properties,
@@ -55,6 +61,7 @@ public class BookingService {
 	) {
 		this.bookingRequestRepository = bookingRequestRepository;
 		this.roomContentRepository = roomContentRepository;
+		this.roomTypeRepository = roomTypeRepository;
 		this.roomAvailabilityService = roomAvailabilityService;
 		this.onePmsClient = onePmsClient;
 		this.properties = properties;
@@ -235,6 +242,190 @@ public class BookingService {
 		);
 		bookingMailService.sendBookingEmails(response, entity.getGuestName(), guestEmail);
 		return response;
+	}
+
+	public BookingLookupResponse lookupByReference(String bookingReference, String locale) {
+		String ref = blankToNull(bookingReference);
+		if (ref == null) {
+			throw new ApiException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Booking reference is required");
+		}
+
+		String resolvedLocale = resolveLocale(locale);
+		OnePmsBookingDetails details = onePmsClient.getBookingDetails(properties.onepms().hotelId(), ref);
+		if (details == null) {
+			throw new ApiException(HttpStatus.NOT_FOUND, "BOOKING_NOT_FOUND", "Booking not found");
+		}
+
+		List<BookingLookupResponse.Room> rooms = details.rooms() == null
+				? List.of()
+				: details.rooms().stream()
+						.map(room -> new BookingLookupResponse.Room(
+								room.roomTypeId(),
+								resolveRoomTitle(room.roomTypeId(), resolvedLocale),
+								room.roomNumber(),
+								room.adult(),
+								room.child(),
+								room.breakfast(),
+								room.lunch(),
+								room.dinner(),
+								room.rates() == null ? List.of() : room.rates()
+						))
+						.toList();
+
+		List<BookingLookupResponse.ServiceLine> services = details.services() == null
+				? List.of()
+				: details.services().stream()
+						.map(service -> new BookingLookupResponse.ServiceLine(
+								service.serviceId(),
+								service.serviceName(),
+								service.serviceType(),
+								service.quantity(),
+								service.unitPrice(),
+								service.totalPrice()
+						))
+						.toList();
+
+		List<BookingLookupResponse.Payment> payments = details.payments() == null
+				? List.of()
+				: details.payments().stream()
+						.map(payment -> new BookingLookupResponse.Payment(
+								payment.paymentDate(),
+								payment.paymentMethodId(),
+								payment.paymentMethodName(),
+								payment.amount(),
+								payment.paymentStatus(),
+								payment.transactionId()
+						))
+						.toList();
+
+		List<String> bookingIds = details.bookingIds() == null || details.bookingIds().isEmpty()
+				? (details.bookingId() == null || details.bookingId().isBlank()
+						? List.of()
+						: List.of(details.bookingId()))
+				: details.bookingIds();
+
+		return new BookingLookupResponse(
+				details.bookingId(),
+				details.bookingReference(),
+				bookingIds,
+				isCancellable(details.bookingStatus()),
+				details.name(),
+				details.email(),
+				details.phone(),
+				details.arrivalDate(),
+				details.departureDate(),
+				details.bookingStatus(),
+				details.idNumber(),
+				details.idType(),
+				details.address(),
+				details.totalAmount(),
+				details.totalPaid(),
+				details.totalRemaining(),
+				details.paymentStatus(),
+				"VND",
+				rooms,
+				services,
+				payments,
+				details.created(),
+				details.updated(),
+				details.checkInTime(),
+				details.checkOutTime(),
+				details.notes()
+		);
+	}
+
+	public BookingLookupResponse cancelByReference(CancelBookingRequest request) {
+		String ref = blankToNull(request.bookingReference());
+		if (ref == null) {
+			throw new ApiException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Booking reference is required");
+		}
+
+		String locale = resolveLocale(request.locale());
+		BookingLookupResponse current = lookupByReference(ref, locale);
+		if (!current.cancellable()) {
+			throw new ApiException(
+					HttpStatus.CONFLICT,
+					"BOOKING_NOT_CANCELLABLE",
+					"Booking cannot be cancelled in its current status"
+			);
+		}
+
+		List<String> bookingIds = current.bookingIds() == null || current.bookingIds().isEmpty()
+				? (current.bookingId() == null || current.bookingId().isBlank()
+						? List.of()
+						: List.of(current.bookingId()))
+				: current.bookingIds();
+		if (bookingIds.isEmpty()) {
+			throw new ApiException(HttpStatus.BAD_GATEWAY, "ONEPMS_SCHEMA", "Booking IDs missing for cancel");
+		}
+
+		onePmsClient.cancelBooking(
+				properties.onepms().hotelId(),
+				current.bookingReference() == null || current.bookingReference().isBlank()
+						? ref
+						: current.bookingReference(),
+				bookingIds
+		);
+
+		try {
+			return lookupByReference(ref, locale);
+		} catch (ApiException ex) {
+			// Some PMS responses remove the booking from lookup after cancel.
+			if ("BOOKING_NOT_FOUND".equals(ex.getCode()) || HttpStatus.NOT_FOUND.equals(ex.getStatus())) {
+				return new BookingLookupResponse(
+						current.bookingId(),
+						current.bookingReference(),
+						bookingIds,
+						false,
+						current.name(),
+						current.email(),
+						current.phone(),
+						current.arrivalDate(),
+						current.departureDate(),
+						"-1",
+						current.idNumber(),
+						current.idType(),
+						current.address(),
+						current.totalAmount(),
+						current.totalPaid(),
+						current.totalRemaining(),
+						current.paymentStatus(),
+						current.currency(),
+						current.rooms(),
+						current.services(),
+						current.payments(),
+						current.created(),
+						current.updated(),
+						current.checkInTime(),
+						current.checkOutTime(),
+						current.notes()
+				);
+			}
+			throw ex;
+		}
+	}
+
+	private static boolean isCancellable(String bookingStatus) {
+		if (bookingStatus == null || bookingStatus.isBlank()) {
+			return false;
+		}
+		String value = bookingStatus.trim().toLowerCase();
+		return "0".equals(value)
+				|| "booked".equals(value)
+				|| "confirmed".equals(value);
+	}
+
+	private String resolveRoomTitle(String roomTypeId, String locale) {
+		if (roomTypeId == null || roomTypeId.isBlank()) {
+			return null;
+		}
+		return roomTypeRepository.findByExternalId(roomTypeId)
+				.map(roomType -> roomContentRepository.findByRoomTypeIdAndLocale(roomType.getId(), locale)
+						.map(RoomContent::getTitle)
+						.filter(title -> title != null && !title.isBlank())
+						.orElse(roomType.getName()))
+				.filter(title -> title != null && !title.isBlank())
+				.orElse(roomTypeId);
 	}
 
 	private String nextRequestCode() {

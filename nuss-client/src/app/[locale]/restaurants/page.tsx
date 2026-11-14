@@ -61,6 +61,9 @@ export default async function RestaurantsPage({ params }: Props) {
                     ) : null}
                   </Link>
                   <div className="restaurant-row-body">
+                    <p className="restaurant-row-kind">
+                      {item.kind === "bar" ? t("kindBar") : t("kindRestaurant")}
+                    </p>
                     <h2>
                       <Link href={href}>{item.title}</Link>
                     </h2>

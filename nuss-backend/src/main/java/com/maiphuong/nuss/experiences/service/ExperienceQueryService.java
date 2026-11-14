@@ -1,5 +1,6 @@
 package com.maiphuong.nuss.experiences.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maiphuong.nuss.experiences.dto.ExperienceImageResponse;
 import com.maiphuong.nuss.experiences.dto.PublicExperienceResponse;
 import com.maiphuong.nuss.experiences.entity.Experience;
@@ -7,6 +8,7 @@ import com.maiphuong.nuss.experiences.entity.ExperienceContent;
 import com.maiphuong.nuss.experiences.entity.ExperienceImage;
 import com.maiphuong.nuss.experiences.repository.ExperienceContentRepository;
 import com.maiphuong.nuss.experiences.repository.ExperienceImageRepository;
+import com.maiphuong.nuss.pagebuilder.DocumentValidator;
 import com.maiphuong.nuss.shared.api.ApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,13 +24,16 @@ public class ExperienceQueryService {
 
 	private final ExperienceContentRepository contentRepository;
 	private final ExperienceImageRepository imageRepository;
+	private final ObjectMapper objectMapper;
 
 	public ExperienceQueryService(
 			ExperienceContentRepository contentRepository,
-			ExperienceImageRepository imageRepository
+			ExperienceImageRepository imageRepository,
+			ObjectMapper objectMapper
 	) {
 		this.contentRepository = contentRepository;
 		this.imageRepository = imageRepository;
+		this.objectMapper = objectMapper;
 	}
 
 	@Transactional(readOnly = true)
@@ -36,7 +41,7 @@ public class ExperienceQueryService {
 		String resolvedLocale = resolveLocale(locale);
 		String resolvedGroup = resolveGroup(group);
 		return contentRepository.findPublished(resolvedLocale, resolvedGroup).stream()
-				.map(content -> toPublic(content, false))
+				.map(content -> toPublic(content, false, false))
 				.toList();
 	}
 
@@ -48,10 +53,21 @@ public class ExperienceQueryService {
 		if (!content.getExperience().isActive()) {
 			throw new ApiException(HttpStatus.NOT_FOUND, "EXPERIENCE_NOT_FOUND", "Experience not found");
 		}
-		return toPublic(content, true);
+		return toPublic(content, true, false);
 	}
 
-	private PublicExperienceResponse toPublic(ExperienceContent content, boolean includeGallery) {
+	@Transactional(readOnly = true)
+	public PublicExperienceResponse getPreview(String token, ExperiencePreviewTokenService previewTokenService) {
+		ExperiencePreviewTokenService.PreviewRef ref = previewTokenService.resolve(token);
+		ExperienceContent content = contentRepository.findByExperienceIdAndLocale(ref.experienceId(), ref.locale())
+				.orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "CONTENT_MISSING", "Content for locale is missing"));
+		if (!content.getExperience().isActive()) {
+			throw new ApiException(HttpStatus.NOT_FOUND, "EXPERIENCE_NOT_FOUND", "Experience not found");
+		}
+		return toPublic(content, true, true);
+	}
+
+	private PublicExperienceResponse toPublic(ExperienceContent content, boolean includeGallery, boolean preview) {
 		Experience experience = content.getExperience();
 		List<ExperienceImage> images = imageRepository.findByExperienceIdOrderByDisplayOrderAsc(experience.getId());
 		ExperienceImageResponse cover = images.stream()
@@ -64,6 +80,11 @@ public class ExperienceQueryService {
 				? images.stream().map(this::toImage).toList()
 				: List.of();
 
+		String rawDocument = preview ? content.getDocumentDraft() : content.getDocumentPublished();
+		if (rawDocument == null || rawDocument.isBlank()) {
+			rawDocument = DocumentValidator.EMPTY_DOCUMENT;
+		}
+
 		return new PublicExperienceResponse(
 				experience.getId(),
 				experience.getExperienceGroup(),
@@ -71,19 +92,21 @@ public class ExperienceQueryService {
 				content.getSlug(),
 				content.getTitle(),
 				content.getShortDescription(),
-				content.getDescription(),
-				content.getItinerary(),
-				content.getDurationText(),
-				content.getPriceAmount(),
-				content.getPriceCurrency(),
-				content.getPriceNote(),
-				content.getConditions(),
 				content.getSeoTitle(),
 				content.getSeoDescription(),
 				experience.getDisplayOrder(),
+				readJson(rawDocument),
 				cover,
 				gallery
 		);
+	}
+
+	private Object readJson(String raw) {
+		try {
+			return objectMapper.readValue(raw, Object.class);
+		} catch (Exception ex) {
+			return objectMapper.createObjectNode();
+		}
 	}
 
 	private ExperienceImageResponse toImage(ExperienceImage image) {

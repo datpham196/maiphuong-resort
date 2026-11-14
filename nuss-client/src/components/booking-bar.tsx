@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "@/i18n/navigation";
+import { useI18nNavRouter } from "@/hooks/use-nav-router";
 import { MAX_PARTY_ADULTS, MAX_PARTY_CHILDREN } from "@/lib/room-party";
 
 export type BookingSearchValues = {
@@ -157,7 +157,7 @@ export function BookingBar({
 }: BookingBarProps) {
   const t = useTranslations("BookingBar");
   const locale = useLocale();
-  const router = useRouter();
+  const router = useI18nNavRouter();
   const rootRef = useRef<HTMLFormElement>(null);
   const onChangeRef = useRef(onChange);
 

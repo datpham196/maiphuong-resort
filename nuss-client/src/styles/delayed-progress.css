@@ -1,0 +1,53 @@
+.delayed-progress {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 10000;
+  height: 3px;
+  pointer-events: none;
+  opacity: 0;
+  overflow: hidden;
+  background: transparent;
+  transition: opacity 0.15s ease;
+}
+
+.delayed-progress.is-visible {
+  opacity: 1;
+}
+
+.delayed-progress-bar {
+  display: block;
+  width: 40%;
+  height: 100%;
+  border-radius: 999px;
+  transform: translateX(-100%);
+}
+
+.delayed-progress.is-visible .delayed-progress-bar {
+  animation: delayed-progress-slide 1.05s ease-in-out infinite;
+}
+
+.delayed-progress.is-public .delayed-progress-bar {
+  background: linear-gradient(90deg, transparent, var(--ocean, #164e63), transparent);
+}
+
+.delayed-progress.is-admin .delayed-progress-bar {
+  background: linear-gradient(90deg, transparent, var(--admin-cyan, #2ad4df), var(--admin-teal, #1f9aa0), transparent);
+}
+
+@keyframes delayed-progress-slide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(280%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .delayed-progress.is-visible .delayed-progress-bar {
+    animation: none;
+    width: 100%;
+    transform: none;
+    opacity: 0.85;
+  }
+}

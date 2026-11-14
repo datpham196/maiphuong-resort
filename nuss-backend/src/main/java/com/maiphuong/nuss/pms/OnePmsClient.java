@@ -3,6 +3,7 @@ package com.maiphuong.nuss.pms;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maiphuong.nuss.pms.dto.OnePmsAvailabilityItem;
+import com.maiphuong.nuss.pms.dto.OnePmsBookingDetails;
 import com.maiphuong.nuss.pms.dto.OnePmsBookingResult;
 import com.maiphuong.nuss.pms.dto.OnePmsEnvelope;
 import com.maiphuong.nuss.pms.dto.OnePmsRoomTypeDto;
@@ -175,6 +176,196 @@ public class OnePmsClient {
 		return new OnePmsBookingResult(bookingReference, bookingIds);
 	}
 
+	public OnePmsBookingDetails getBookingDetails(String hotelId, String bookingReference) {
+		Map<String, Object> body = new LinkedHashMap<>();
+		body.put("hotelID", hotelId);
+		body.put("bookingReference", bookingReference);
+
+		OnePmsEnvelope envelope = post("/api-getBookingDetails", body);
+		if (!envelope.isSuccess()) {
+			throw new ApiException(
+					HttpStatus.BAD_GATEWAY,
+					"ONEPMS_" + envelope.result(),
+					envelope.message() == null || envelope.message().isBlank()
+							? "OnePMS getBookingDetails failed"
+							: envelope.message()
+			);
+		}
+
+		JsonNode data = envelope.data();
+		if (data == null || !data.isArray() || data.isEmpty()) {
+			return null;
+		}
+
+		List<String> bookingIds = new ArrayList<>();
+		for (JsonNode item : data) {
+			String id = text(item, "bookingID");
+			if (id != null && !id.isBlank() && !bookingIds.contains(id)) {
+				bookingIds.add(id);
+			}
+		}
+
+		OnePmsBookingDetails parsed = parseBookingDetails(data.get(0), bookingIds);
+		if (parsed.bookingIds().isEmpty() && parsed.bookingId() != null && !parsed.bookingId().isBlank()) {
+			return new OnePmsBookingDetails(
+					parsed.bookingId(),
+					parsed.bookingReference(),
+					List.of(parsed.bookingId()),
+					parsed.hotelId(),
+					parsed.name(),
+					parsed.email(),
+					parsed.phone(),
+					parsed.arrivalDate(),
+					parsed.departureDate(),
+					parsed.bookingStatus(),
+					parsed.idNumber(),
+					parsed.idType(),
+					parsed.address(),
+					parsed.totalAmount(),
+					parsed.totalPaid(),
+					parsed.totalRemaining(),
+					parsed.paymentStatus(),
+					parsed.rooms(),
+					parsed.services(),
+					parsed.payments(),
+					parsed.created(),
+					parsed.updated(),
+					parsed.checkInTime(),
+					parsed.checkOutTime(),
+					parsed.notes()
+			);
+		}
+		return parsed;
+	}
+
+	public void cancelBooking(String hotelId, String bookingReference, List<String> bookingIds) {
+		if (bookingIds == null || bookingIds.isEmpty()) {
+			throw new ApiException(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "bookingIDs are required to cancel");
+		}
+
+		Map<String, Object> body = new LinkedHashMap<>();
+		body.put("hotelID", hotelId);
+		body.put("bookingReference", bookingReference);
+		body.put("bookingIDs", bookingIds);
+
+		OnePmsEnvelope envelope = post("/api-cancelBooking", body);
+		if (envelope.isSuccess()) {
+			return;
+		}
+
+		String result = envelope.result() == null ? "" : envelope.result();
+		String message = envelope.message() == null || envelope.message().isBlank()
+				? "OnePMS cancelBooking failed"
+				: envelope.message();
+
+		HttpStatus status = switch (result) {
+			case "009" -> HttpStatus.NOT_FOUND;
+			case "010", "011", "012", "013", "014", "015", "021" -> HttpStatus.CONFLICT;
+			default -> HttpStatus.BAD_GATEWAY;
+		};
+		throw new ApiException(status, "ONEPMS_" + result, message);
+	}
+
+	private OnePmsBookingDetails parseBookingDetails(JsonNode node, List<String> bookingIds) {
+		List<OnePmsBookingDetails.Room> rooms = new ArrayList<>();
+		JsonNode roomsNode = node.get("rooms");
+		if (roomsNode != null && roomsNode.isArray()) {
+			for (JsonNode roomNode : roomsNode) {
+				List<BigDecimal> rates = new ArrayList<>();
+				JsonNode ratesNode = roomNode.get("rates");
+				if (ratesNode != null && ratesNode.isArray()) {
+					for (JsonNode rateNode : ratesNode) {
+						if (rateNode == null || rateNode.isNull()) {
+							continue;
+						}
+						if (rateNode.isNumber()) {
+							rates.add(rateNode.decimalValue());
+						} else {
+							BigDecimal parsed = decimal(rateNode, "rate");
+							if (parsed == null) {
+								try {
+									rates.add(new BigDecimal(rateNode.asText()));
+								} catch (NumberFormatException ignored) {
+									// Skip invalid rate entries.
+								}
+							} else {
+								rates.add(parsed);
+							}
+						}
+					}
+				}
+				rooms.add(new OnePmsBookingDetails.Room(
+						text(roomNode, "roomTypeID"),
+						text(roomNode, "roomNumber"),
+						intValue(roomNode, "adult"),
+						intValue(roomNode, "child"),
+						boolValue(roomNode, "breakfast"),
+						boolValue(roomNode, "lunch"),
+						boolValue(roomNode, "dinner"),
+						rates
+				));
+			}
+		}
+
+		List<OnePmsBookingDetails.ServiceLine> services = new ArrayList<>();
+		JsonNode servicesNode = node.get("services");
+		if (servicesNode != null && servicesNode.isArray()) {
+			for (JsonNode serviceNode : servicesNode) {
+				services.add(new OnePmsBookingDetails.ServiceLine(
+						text(serviceNode, "serviceID"),
+						text(serviceNode, "serviceName"),
+						text(serviceNode, "serviceType"),
+						intValue(serviceNode, "quantity"),
+						decimal(serviceNode, "unitPrice"),
+						decimal(serviceNode, "totalPrice")
+				));
+			}
+		}
+
+		List<OnePmsBookingDetails.Payment> payments = new ArrayList<>();
+		JsonNode paymentsNode = node.get("payments");
+		if (paymentsNode != null && paymentsNode.isArray()) {
+			for (JsonNode paymentNode : paymentsNode) {
+				payments.add(new OnePmsBookingDetails.Payment(
+						text(paymentNode, "paymentDate"),
+						text(paymentNode, "paymentMethodID"),
+						text(paymentNode, "paymentMethodName"),
+						decimal(paymentNode, "amount"),
+						text(paymentNode, "paymentStatus"),
+						text(paymentNode, "transactionID")
+				));
+			}
+		}
+
+		return new OnePmsBookingDetails(
+				text(node, "bookingID"),
+				text(node, "bookingReference"),
+				bookingIds == null ? List.of() : List.copyOf(bookingIds),
+				text(node, "hotelID"),
+				text(node, "name"),
+				text(node, "email"),
+				text(node, "phone"),
+				text(node, "arrivalDate"),
+				text(node, "departureDate"),
+				text(node, "bookingStatus"),
+				text(node, "idNumber"),
+				text(node, "idType"),
+				text(node, "address"),
+				decimal(node, "totalAmount"),
+				decimal(node, "totalPaid"),
+				decimal(node, "totalRemaining"),
+				text(node, "paymentStatus"),
+				rooms,
+				services,
+				payments,
+				text(node, "created"),
+				text(node, "updated"),
+				text(node, "checkInTime"),
+				text(node, "checkOutTime"),
+				text(node, "notes")
+		);
+	}
+
 	private OnePmsEnvelope post(String path, Object body) {
 		try {
 			String response = restClient.post()
@@ -286,7 +477,35 @@ public class OnePmsClient {
 
 	private static Integer intValue(JsonNode node, String field) {
 		JsonNode value = node.get(field);
-		return value == null || value.isNull() || !value.isNumber() ? null : value.intValue();
+		if (value == null || value.isNull()) {
+			return null;
+		}
+		if (value.isNumber()) {
+			return value.intValue();
+		}
+		try {
+			return Integer.parseInt(value.asText().trim());
+		} catch (NumberFormatException ex) {
+			return null;
+		}
+	}
+
+	private static Boolean boolValue(JsonNode node, String field) {
+		JsonNode value = node.get(field);
+		if (value == null || value.isNull()) {
+			return null;
+		}
+		if (value.isBoolean()) {
+			return value.booleanValue();
+		}
+		String text = value.asText();
+		if ("true".equalsIgnoreCase(text) || "1".equals(text)) {
+			return true;
+		}
+		if ("false".equalsIgnoreCase(text) || "0".equals(text)) {
+			return false;
+		}
+		return null;
 	}
 
 	private static BigDecimal decimal(JsonNode node, String field) {

@@ -39,8 +39,8 @@ public class AdminRestaurantController {
 	}
 
 	@GetMapping("/primary")
-	public AdminRestaurantResponse primary() {
-		return restaurantAdminService.getPrimary();
+	public AdminRestaurantResponse primary(@RequestParam(defaultValue = "restaurant") String kind) {
+		return restaurantAdminService.getPrimary(kind);
 	}
 
 	@PostMapping

@@ -13,9 +13,22 @@
   --pb-paper: #ffffff;
   --pb-danger: #b42318;
   --pb-danger-soft: #fdecea;
-  display: grid;
+  --pb-sticky-top: 4.75rem;
+  display: flex;
+  flex-direction: column;
   gap: 0.85rem;
   min-height: calc(100vh - 7rem);
+  /* Keep builder chrome + settings visible while the page above scrolls away */
+  position: sticky;
+  top: var(--pb-sticky-top);
+  z-index: 4;
+  max-height: calc(100vh - var(--pb-sticky-top) - 0.75rem);
+  overflow: hidden;
+}
+
+.pb-shell > .pb-layout {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 /* Shared button system used by builder + restaurant admin header */
@@ -208,7 +221,8 @@
   grid-template-columns: 250px minmax(0, 1fr) 300px;
   gap: 0.85rem;
   min-height: 0;
-  align-items: start;
+  height: 100%;
+  align-items: stretch;
 }
 
 .pb-sidebar,
@@ -224,10 +238,12 @@
 .pb-sidebar,
 .pb-settings-wrap {
   padding: 1rem;
-  position: sticky;
-  top: 0.5rem;
-  max-height: calc(100vh - 8rem);
+  position: relative;
+  top: auto;
+  height: 100%;
+  max-height: none;
   overflow: auto;
+  overscroll-behavior: contain;
 }
 
 .pb-sidebar h3,
@@ -320,7 +336,10 @@
 
 .pb-canvas {
   padding: 1rem;
-  min-height: 28rem;
+  min-height: 0;
+  height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
   background:
     linear-gradient(180deg, rgba(247, 244, 236, 0.55), rgba(255, 255, 255, 0.9)),
     var(--pb-paper);
@@ -333,7 +352,10 @@
   border: 1px solid var(--pb-line);
   border-radius: 18px;
   padding: 1.15rem;
+  min-width: 0;
+  max-width: 100%;
   min-height: 24rem;
+  overflow-x: clip;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 10px 28px rgba(36, 59, 62, 0.05);
 }
 
@@ -782,14 +804,33 @@
 }
 
 @media (max-width: 1100px) {
+  .pb-shell {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .pb-shell > .pb-layout {
+    flex: none;
+    min-height: 0;
+  }
+
   .pb-layout {
     grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .pb-sidebar,
+  .pb-settings-wrap,
+  .pb-canvas {
+    position: static;
+    height: auto;
+    max-height: none;
+    overflow: visible;
   }
 
   .pb-sidebar,
   .pb-settings-wrap {
-    position: static;
-    max-height: none;
     display: none;
   }
 
@@ -798,6 +839,10 @@
   .pb-sidebar.is-open,
   .pb-settings-wrap.is-open {
     display: block;
+  }
+
+  .pb-canvas {
+    min-height: 28rem;
   }
 
   .pb-mobile-tabs {

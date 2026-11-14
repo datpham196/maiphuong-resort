@@ -18,7 +18,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { SettingsPanel } from "@/components/page-builder/SettingsPanel";
 import { BLOCK_DEFINITIONS, BLOCK_REGISTRY } from "@/components/page-builder/registry";
 import { PageRenderer } from "@/components/page-builder/render/PageRenderer";
@@ -35,33 +35,32 @@ import {
 } from "@/components/page-builder/document-utils";
 import type { BlockNode, PageDocument } from "@/components/page-builder/types";
 import { ApiError } from "@/services/api";
-import {
-  createRestaurantPreviewToken,
-  publishRestaurantContent,
-  saveRestaurantContent,
-} from "@/services/admin-restaurants";
+import type { PageBuilderApi } from "@/components/page-builder/page-builder-api";
 import { useAdminToast } from "@/components/admin-toast";
 
 type Device = "desktop" | "tablet" | "mobile";
 
 type Props = {
-  restaurantId: string;
   locale: string;
   title: string;
   slug: string;
   shortDescription: string;
+  /** Hide slug field when the public URL is fixed (e.g. /spa, /offers). */
+  hideSlug?: boolean;
   initialDocument: PageDocument;
+  api: PageBuilderApi;
   onMetaChange?: (meta: { title: string; slug: string; shortDescription: string }) => void;
   onSaved?: () => void;
 };
 
 export function PageBuilderShell({
-  restaurantId,
   locale,
   title: initialTitle,
   slug: initialSlug,
   shortDescription: initialShort,
+  hideSlug = false,
   initialDocument,
+  api,
   onMetaChange,
   onSaved,
 }: Props) {
@@ -79,11 +78,31 @@ export function PageBuilderShell({
   const [shortDescription, setShortDescription] = useState(initialShort);
   const [activeDragLabel, setActiveDragLabel] = useState<string | null>(null);
   const [mobilePanel, setMobilePanel] = useState<"palette" | "settings" | null>(null);
+  const settingsWrapRef = useRef<HTMLDivElement | null>(null);
+  const canvasRef = useRef<HTMLElement | null>(null);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
   const selected = selectedId ? findNode(document.root, selectedId) : null;
   const tree = useMemo(() => flattenTree(document.root), [document]);
   const rootIds = (document.root.children ?? []).map((child) => child.id);
+
+  function selectBlock(id: string | null) {
+    setSelectedId(id);
+    if (id) setMobilePanel("settings");
+  }
+
+  useEffect(() => {
+    if (!selectedId) return;
+    const frame = canvasRef.current?.querySelector<HTMLElement>(`[data-block-id="${selectedId}"]`);
+    frame?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    const settings = settingsWrapRef.current;
+    if (!settings) return;
+    if (window.matchMedia("(max-width: 1100px)").matches) {
+      settings.scrollIntoView({ block: "start", behavior: "smooth" });
+    } else {
+      settings.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [selectedId]);
 
   function pushDocument(next: PageDocument) {
     setDocument(next);
@@ -182,7 +201,7 @@ export function PageBuilderShell({
     setErrorIds([]);
     setErrorMessages([]);
     try {
-      await saveRestaurantContent(restaurantId, locale, {
+      await api.saveContent(locale, {
         title,
         slug,
         shortDescription,
@@ -204,13 +223,13 @@ export function PageBuilderShell({
     setErrorIds([]);
     setErrorMessages([]);
     try {
-      await saveRestaurantContent(restaurantId, locale, {
+      await api.saveContent(locale, {
         title,
         slug,
         shortDescription,
         documentDraft: document,
       });
-      await publishRestaurantContent(restaurantId, locale);
+      await api.publishContent(locale);
       onMetaChange?.({ title, slug, shortDescription });
       onSaved?.();
       toast.success("Đã publish");
@@ -233,17 +252,33 @@ export function PageBuilderShell({
 
   async function openPreview() {
     try {
-      await saveRestaurantContent(restaurantId, locale, {
+      await api.saveContent(locale, {
         title,
         slug,
         shortDescription,
         documentDraft: document,
       });
-      const preview = await createRestaurantPreviewToken(restaurantId, locale);
-      window.open(`/${locale}/restaurants/preview?token=${encodeURIComponent(preview.token)}`, "_blank");
+      const preview = await api.createPreviewToken(locale);
+      window.open(api.previewPath(locale, preview.token), "_blank");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Không tạo được preview";
       toast.error(message);
+    }
+  }
+
+  async function unpublish() {
+    if (!api.unpublishContent) return;
+    if (!window.confirm("Gỡ xuất bản locale này? Trang sẽ ẩn khỏi website công khai.")) return;
+    setSaving(true);
+    try {
+      await api.unpublishContent(locale);
+      onSaved?.();
+      toast.success("Đã gỡ xuất bản");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Gỡ xuất bản thất bại";
+      toast.error(message);
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -266,10 +301,12 @@ export function PageBuilderShell({
               placeholder="Tiêu đề trang"
             />
           </label>
-          <label className="pb-field">
-            <span>Slug</span>
-            <input aria-label="Slug" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="slug-url" />
-          </label>
+          {hideSlug ? null : (
+            <label className="pb-field">
+              <span>Slug</span>
+              <input aria-label="Slug" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="slug-url" />
+            </label>
+          )}
         </div>
         <div className="pb-device-switch" role="group" aria-label="Device preview">
           {(["desktop", "tablet", "mobile"] as Device[]).map((item) => (
@@ -304,6 +341,16 @@ export function PageBuilderShell({
           <button type="button" className="admin-btn is-primary" disabled={saving} onClick={() => void publish()}>
             Xuất bản
           </button>
+          {api.unpublishContent ? (
+            <button
+              type="button"
+              className="admin-btn is-danger"
+              disabled={saving}
+              onClick={() => void unpublish()}
+            >
+              Gỡ xuất bản
+            </button>
+          ) : null}
         </div>
       </header>
 
@@ -349,7 +396,7 @@ export function PageBuilderShell({
                   <button
                     type="button"
                     className={selectedId === row.id ? "is-active" : undefined}
-                    onClick={() => setSelectedId(row.id)}
+                    onClick={() => selectBlock(row.id)}
                   >
                     {BLOCK_REGISTRY[row.type]?.label ?? row.type}: {row.label}
                   </button>
@@ -359,8 +406,9 @@ export function PageBuilderShell({
           </aside>
 
           <main
+            ref={canvasRef}
             className={`pb-canvas is-${device}`}
-            onClick={() => setSelectedId(null)}
+            onClick={() => selectBlock(null)}
           >
             <div className="pb-canvas-frame">
               {(document.root.children ?? []).length === 0 ? (
@@ -375,10 +423,10 @@ export function PageBuilderShell({
                       key={child.id}
                       id={child.id}
                       selected={selectedId === child.id}
-                      onSelect={() => setSelectedId(child.id)}
+                      onSelect={() => selectBlock(child.id)}
                       onDelete={() => {
                         pushDocument(deleteNode(document, child.id));
-                        if (selectedId === child.id) setSelectedId(null);
+                        if (selectedId === child.id) selectBlock(null);
                       }}
                       onDuplicate={() => pushDocument(duplicateNode(document, child.id))}
                     >
@@ -387,7 +435,7 @@ export function PageBuilderShell({
                         mode="edit"
                         selectedId={selectedId}
                         errorIds={errorIds}
-                        onSelect={setSelectedId}
+                        onSelect={selectBlock}
                       />
                     </SortableBlock>
                   ))}
@@ -396,7 +444,10 @@ export function PageBuilderShell({
             </div>
           </main>
 
-          <div className={`pb-settings-wrap${mobilePanel === "settings" ? " is-open" : ""}`}>
+          <div
+            ref={settingsWrapRef}
+            className={`pb-settings-wrap${mobilePanel === "settings" ? " is-open" : ""}`}
+          >
             <label className="pb-short-desc">
               <span>Mô tả ngắn</span>
               <textarea
@@ -423,7 +474,7 @@ export function PageBuilderShell({
                     onClick={() => {
                       if (!window.confirm("Xóa element này?")) return;
                       pushDocument(deleteNode(document, selected.id));
-                      setSelectedId(null);
+                      selectBlock(null);
                     }}
                   >
                     Xóa khối
@@ -431,7 +482,7 @@ export function PageBuilderShell({
                 </>
               ) : null}
             </div>
-            <SettingsPanel node={selected} restaurantId={restaurantId} onChange={onPropsChange} />
+            <SettingsPanel node={selected} uploadMedia={api.uploadMedia} onChange={onPropsChange} />
           </div>
         </div>
         <DragOverlay>{activeDragLabel ? <div className="pb-drag-ghost">{activeDragLabel}</div> : null}</DragOverlay>

@@ -1,9 +1,12 @@
 package com.maiphuong.nuss.experiences.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maiphuong.nuss.experiences.dto.AdminExperienceResponse;
 import com.maiphuong.nuss.experiences.dto.CreateExperienceRequest;
 import com.maiphuong.nuss.experiences.dto.ExperienceContentRequest;
 import com.maiphuong.nuss.experiences.dto.ExperienceImageResponse;
+import com.maiphuong.nuss.experiences.dto.MediaUploadResponse;
+import com.maiphuong.nuss.experiences.dto.PreviewTokenResponse;
 import com.maiphuong.nuss.experiences.dto.UpdateExperienceRequest;
 import com.maiphuong.nuss.experiences.entity.Experience;
 import com.maiphuong.nuss.experiences.entity.ExperienceContent;
@@ -11,6 +14,7 @@ import com.maiphuong.nuss.experiences.entity.ExperienceImage;
 import com.maiphuong.nuss.experiences.repository.ExperienceContentRepository;
 import com.maiphuong.nuss.experiences.repository.ExperienceImageRepository;
 import com.maiphuong.nuss.experiences.repository.ExperienceRepository;
+import com.maiphuong.nuss.pagebuilder.DocumentValidator;
 import com.maiphuong.nuss.rooms.service.ImageStorageService;
 import com.maiphuong.nuss.shared.api.ApiException;
 import org.springframework.http.HttpStatus;
@@ -18,11 +22,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 @Service
 public class ExperienceAdminService {
@@ -34,22 +41,32 @@ public class ExperienceAdminService {
 			"tour", "layout2",
 			"ticket", "layout3"
 	);
+	private static final Pattern SLUG_PATTERN = Pattern.compile("^[a-z0-9]+(?:-[a-z0-9]+)*$");
 
 	private final ExperienceRepository experienceRepository;
 	private final ExperienceContentRepository contentRepository;
 	private final ExperienceImageRepository imageRepository;
 	private final ImageStorageService imageStorageService;
+	private final DocumentValidator documentValidator;
+	private final ExperiencePreviewTokenService previewTokenService;
+	private final ObjectMapper objectMapper;
 
 	public ExperienceAdminService(
 			ExperienceRepository experienceRepository,
 			ExperienceContentRepository contentRepository,
 			ExperienceImageRepository imageRepository,
-			ImageStorageService imageStorageService
+			ImageStorageService imageStorageService,
+			DocumentValidator documentValidator,
+			ExperiencePreviewTokenService previewTokenService,
+			ObjectMapper objectMapper
 	) {
 		this.experienceRepository = experienceRepository;
 		this.contentRepository = contentRepository;
 		this.imageRepository = imageRepository;
 		this.imageStorageService = imageStorageService;
+		this.documentValidator = documentValidator;
+		this.previewTokenService = previewTokenService;
+		this.objectMapper = objectMapper;
 	}
 
 	@Transactional(readOnly = true)
@@ -125,10 +142,20 @@ public class ExperienceAdminService {
 		if (blankToNull(content.getTitle()) == null) {
 			throw new ApiException(HttpStatus.BAD_REQUEST, "TITLE_REQUIRED", "Title is required to publish");
 		}
-		if (blankToNull(content.getSlug()) == null) {
+		String slug = blankToNull(content.getSlug());
+		if (slug == null) {
 			throw new ApiException(HttpStatus.BAD_REQUEST, "SLUG_REQUIRED", "Slug is required to publish");
 		}
+		if (!SLUG_PATTERN.matcher(slug).matches()) {
+			throw new ApiException(HttpStatus.BAD_REQUEST, "SLUG_INVALID", "Slug must be lowercase kebab-case");
+		}
+		if (contentRepository.existsByLocaleAndSlugAndExperienceIdNot(locale, slug, id)) {
+			throw new ApiException(HttpStatus.CONFLICT, "SLUG_TAKEN", "Slug already used for this locale");
+		}
+		documentValidator.validateOrThrow(content.getDocumentDraft());
+		content.setDocumentPublished(content.getDocumentDraft());
 		content.setPublished(true);
+		content.setPublishedAt(Instant.now());
 		contentRepository.save(content);
 		return toAdmin(experience);
 	}
@@ -142,6 +169,23 @@ public class ExperienceAdminService {
 		content.setPublished(false);
 		contentRepository.save(content);
 		return toAdmin(experience);
+	}
+
+	@Transactional
+	public MediaUploadResponse uploadMedia(UUID id, MultipartFile file) {
+		requireExperience(id);
+		ImageStorageService.StoredFile stored = imageStorageService.store("experiences", id, file);
+		return new MediaUploadResponse(stored.publicUrl(), stored.storageKey());
+	}
+
+	@Transactional(readOnly = true)
+	public PreviewTokenResponse createPreviewToken(UUID id, String locale) {
+		validateLocale(locale);
+		requireExperience(id);
+		contentRepository.findByExperienceIdAndLocale(id, locale)
+				.orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "CONTENT_MISSING", "Content for locale is missing"));
+		String token = previewTokenService.issue(id, locale);
+		return new PreviewTokenResponse(token, ExperiencePreviewTokenService.TTL_SECONDS);
 	}
 
 	@Transactional
@@ -232,26 +276,66 @@ public class ExperienceAdminService {
 					ExperienceContent created = new ExperienceContent();
 					created.setExperience(experience);
 					created.setLocale(locale);
+					created.setDocumentDraft(DocumentValidator.EMPTY_DOCUMENT);
 					return created;
 				});
 
-		String slug = normalizeSlug(request.slug());
-		if (slug != null && contentRepository.existsByLocaleAndSlugAndExperienceIdNot(locale, slug, experience.getId())) {
-			throw new ApiException(HttpStatus.CONFLICT, "SLUG_TAKEN", "Slug already used for this locale");
+		if (request.slug() != null) {
+			String slug = blankToNull(request.slug());
+			if (slug != null) {
+				slug = slug.trim().toLowerCase(Locale.ROOT);
+				if (!SLUG_PATTERN.matcher(slug).matches()) {
+					throw new ApiException(HttpStatus.BAD_REQUEST, "SLUG_INVALID", "Slug must be lowercase kebab-case");
+				}
+				if (contentRepository.existsByLocaleAndSlugAndExperienceIdNot(locale, slug, experience.getId())) {
+					throw new ApiException(HttpStatus.CONFLICT, "SLUG_TAKEN", "Slug already used for this locale");
+				}
+			}
+			content.setSlug(slug);
 		}
-
-		content.setSlug(slug);
-		content.setTitle(blankToNull(request.title()));
-		content.setShortDescription(blankToNull(request.shortDescription()));
-		content.setDescription(blankToNull(request.description()));
-		content.setItinerary(blankToNull(request.itinerary()));
-		content.setDurationText(blankToNull(request.durationText()));
-		content.setPriceAmount(request.priceAmount());
-		content.setPriceCurrency(blankToNull(request.priceCurrency()) == null ? "VND" : request.priceCurrency().trim().toUpperCase());
-		content.setPriceNote(blankToNull(request.priceNote()));
-		content.setConditions(blankToNull(request.conditions()));
-		content.setSeoTitle(blankToNull(request.seoTitle()));
-		content.setSeoDescription(blankToNull(request.seoDescription()));
+		if (request.title() != null) {
+			content.setTitle(blankToNull(request.title()));
+		}
+		if (request.shortDescription() != null) {
+			content.setShortDescription(blankToNull(request.shortDescription()));
+		}
+		if (request.description() != null) {
+			content.setDescription(blankToNull(request.description()));
+		}
+		if (request.itinerary() != null) {
+			content.setItinerary(blankToNull(request.itinerary()));
+		}
+		if (request.durationText() != null) {
+			content.setDurationText(blankToNull(request.durationText()));
+		}
+		if (request.priceAmount() != null) {
+			content.setPriceAmount(request.priceAmount());
+		}
+		if (request.priceCurrency() != null) {
+			content.setPriceCurrency(blankToNull(request.priceCurrency()) == null ? "VND" : request.priceCurrency().trim().toUpperCase());
+		}
+		if (request.priceNote() != null) {
+			content.setPriceNote(blankToNull(request.priceNote()));
+		}
+		if (request.conditions() != null) {
+			content.setConditions(blankToNull(request.conditions()));
+		}
+		if (request.seoTitle() != null) {
+			content.setSeoTitle(blankToNull(request.seoTitle()));
+		}
+		if (request.seoDescription() != null) {
+			content.setSeoDescription(blankToNull(request.seoDescription()));
+		}
+		if (request.documentDraft() != null) {
+			String json;
+			try {
+				json = objectMapper.writeValueAsString(request.documentDraft());
+				objectMapper.readTree(json);
+			} catch (Exception ex) {
+				throw new ApiException(HttpStatus.BAD_REQUEST, "DOCUMENT_PARSE", "Invalid documentDraft");
+			}
+			content.setDocumentDraft(json);
+		}
 		contentRepository.save(content);
 	}
 
@@ -261,7 +345,7 @@ public class ExperienceAdminService {
 		for (String locale : List.of("vi", "en")) {
 			ExperienceContent content = contents.stream().filter(c -> locale.equals(c.getLocale())).findFirst().orElse(null);
 			String status;
-			if (content == null) {
+			if (content == null || (blankToNull(content.getTitle()) == null && blankToNull(content.getSlug()) == null)) {
 				status = "Missing";
 			} else if (content.isPublished()) {
 				status = "Published";
@@ -273,15 +357,10 @@ public class ExperienceAdminService {
 					content == null ? null : content.getSlug(),
 					content == null ? null : content.getTitle(),
 					content == null ? null : content.getShortDescription(),
-					content == null ? null : content.getDescription(),
-					content == null ? null : content.getItinerary(),
-					content == null ? null : content.getDurationText(),
-					content == null ? null : content.getPriceAmount(),
-					content == null ? null : content.getPriceCurrency(),
-					content == null ? null : content.getPriceNote(),
-					content == null ? null : content.getConditions(),
 					content == null ? null : content.getSeoTitle(),
 					content == null ? null : content.getSeoDescription(),
+					content == null ? objectMapper.createObjectNode() : readJson(content.getDocumentDraft()),
+					content == null ? null : readJson(content.getDocumentPublished()),
 					content != null && content.isPublished(),
 					status
 			));
@@ -297,6 +376,17 @@ public class ExperienceAdminService {
 				summaries,
 				images
 		);
+	}
+
+	private Object readJson(String raw) {
+		if (raw == null || raw.isBlank()) {
+			return objectMapper.createObjectNode();
+		}
+		try {
+			return objectMapper.readValue(raw, Object.class);
+		} catch (Exception ex) {
+			return objectMapper.createObjectNode();
+		}
 	}
 
 	private ExperienceImageResponse toImage(ExperienceImage image) {
@@ -334,14 +424,11 @@ public class ExperienceAdminService {
 		}
 	}
 
-	private String normalizeSlug(String slug) {
-		if (slug == null || slug.isBlank()) {
+	private String blankToNull(String value) {
+		if (value == null) {
 			return null;
 		}
-		return slug.trim().toLowerCase().replaceAll("[^a-z0-9-]+", "-").replaceAll("^-+|-+$", "");
-	}
-
-	private String blankToNull(String value) {
-		return value == null || value.isBlank() ? null : value.trim();
+		String trimmed = value.trim();
+		return trimmed.isEmpty() ? null : trimmed;
 	}
 }

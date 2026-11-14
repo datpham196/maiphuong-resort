@@ -154,6 +154,44 @@ function BlockView({
         </figure>,
       );
     }
+    case "mediaText": {
+      const src = resolveMediaUrl(asString(props.src));
+      const imagePosition = asString(props.imagePosition, "left") === "right" ? "right" : "left";
+      const stackOnMobile = asBool(props.stackOnMobile, true);
+      const gap = asNumber(props.gap, 24);
+      const radius = asNumber(props.radius, 12);
+      return wrap(
+        <div
+          className={`pb-media-text is-image-${imagePosition}${stackOnMobile ? " is-stack-mobile" : ""}`}
+          style={{ ...marginStyle(margin), gap }}
+        >
+          <figure className="pb-media-text-media">
+            {src ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={src}
+                alt={asString(props.alt) || asString(props.text).slice(0, 80)}
+                style={{ borderRadius: radius }}
+              />
+            ) : (
+              <div className="pb-placeholder">Chưa có ảnh</div>
+            )}
+          </figure>
+          <div className="pb-media-text-body">
+            <p
+              className="pb-media-text-copy"
+              style={{
+                color: asString(props.color, undefined as unknown as string) || undefined,
+                fontSize: asNumber(props.fontSize, 16),
+                whiteSpace: "pre-wrap",
+              }}
+            >
+              {asString(props.text)}
+            </p>
+          </div>
+        </div>,
+      );
+    }
     case "imageGallery": {
       const images = Array.isArray(props.images) ? (props.images as { src?: string; alt?: string }[]) : [];
       const columns = asNumber(props.columns, 3);

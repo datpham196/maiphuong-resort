@@ -1,3 +1,4 @@
+import type { PageDocument } from "@/components/page-builder/types";
 import { apiFetch } from "@/services/api";
 
 export type ExperienceImage = {
@@ -11,20 +12,14 @@ export type ExperienceImage = {
 export type PublicExperience = {
   id: string;
   group: "destination" | "tour" | "ticket" | string;
-  layout: "layout1" | "layout2" | "layout3" | string;
+  layout: string;
   slug: string;
   title: string;
   shortDescription: string | null;
-  description: string | null;
-  itinerary: string | null;
-  durationText: string | null;
-  priceAmount: number | null;
-  priceCurrency: string | null;
-  priceNote: string | null;
-  conditions: string | null;
   seoTitle: string | null;
   seoDescription: string | null;
   displayOrder: number;
+  document: PageDocument;
   coverImage: ExperienceImage | null;
   images: ExperienceImage[];
 };
@@ -41,4 +36,8 @@ export function fetchPublicExperience(slug: string, locale: string) {
   return apiFetch<PublicExperience>(
     `/api/experiences/${encodeURIComponent(slug)}?locale=${encodeURIComponent(locale)}`,
   );
+}
+
+export function fetchExperiencePreview(token: string) {
+  return apiFetch<PublicExperience>(`/api/experiences/preview?token=${encodeURIComponent(token)}`);
 }

@@ -31,14 +31,23 @@ export function BlockSlider({ slides, autoplay = true, intervalMs = 3000, showDo
   const active = valid[index];
   const src = resolveMediaUrl(active.src);
 
+  const caption = active.caption?.trim() || "";
+  const content = active.alt?.trim() || "";
+  const imageAlt = caption || content || "Slide";
+
   return (
     <div className="pb-slider">
       <div className="pb-slider-frame">
         {src ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={src} alt={active.alt ?? ""} />
+          <img src={src} alt={imageAlt} />
         ) : null}
-        {active.caption ? <p className="pb-slider-caption">{active.caption}</p> : null}
+        {caption || content ? (
+          <div className="pb-slider-copy">
+            {caption ? <p className="pb-slider-caption">{caption}</p> : null}
+            {content ? <p className="pb-slider-content">{content}</p> : null}
+          </div>
+        ) : null}
       </div>
       {showDots && valid.length > 1 ? (
         <div className="pb-slider-dots">

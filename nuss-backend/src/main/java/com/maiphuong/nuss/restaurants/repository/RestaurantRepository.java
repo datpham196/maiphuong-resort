@@ -11,4 +11,6 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, UUID> {
 	List<Restaurant> findAllByOrderByDisplayOrderAsc();
 
 	List<Restaurant> findByActiveTrueOrderByDisplayOrderAsc();
+
+	List<Restaurant> findByKindOrderByDisplayOrderAsc(String kind);
 }

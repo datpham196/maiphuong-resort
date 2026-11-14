@@ -4,6 +4,8 @@ import com.maiphuong.nuss.experiences.dto.AdminExperienceResponse;
 import com.maiphuong.nuss.experiences.dto.CreateExperienceRequest;
 import com.maiphuong.nuss.experiences.dto.ExperienceContentRequest;
 import com.maiphuong.nuss.experiences.dto.ExperienceImageResponse;
+import com.maiphuong.nuss.experiences.dto.MediaUploadResponse;
+import com.maiphuong.nuss.experiences.dto.PreviewTokenResponse;
 import com.maiphuong.nuss.experiences.dto.UpdateExperienceRequest;
 import com.maiphuong.nuss.experiences.service.ExperienceAdminService;
 import org.springframework.http.HttpStatus;
@@ -77,6 +79,22 @@ public class AdminExperienceController {
 	@PostMapping("/{id}/contents/{locale}/unpublish")
 	public AdminExperienceResponse unpublish(@PathVariable UUID id, @PathVariable String locale) {
 		return experienceAdminService.unpublish(id, locale);
+	}
+
+	@PostMapping(value = "/{id}/media", consumes = "multipart/form-data")
+	public MediaUploadResponse uploadMedia(
+			@PathVariable UUID id,
+			@RequestParam("file") MultipartFile file
+	) {
+		return experienceAdminService.uploadMedia(id, file);
+	}
+
+	@PostMapping("/{id}/preview-token")
+	public PreviewTokenResponse previewToken(
+			@PathVariable UUID id,
+			@RequestParam String locale
+	) {
+		return experienceAdminService.createPreviewToken(id, locale);
 	}
 
 	@PostMapping(value = "/{id}/images", consumes = "multipart/form-data")

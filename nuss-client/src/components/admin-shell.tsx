@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { AdminToastProvider } from "@/components/admin-toast";
+import { DelayedProgress } from "@/components/delayed-progress";
+import { useNavRouter } from "@/hooks/use-nav-router";
 import { clearAdminToken } from "@/services/admin-rooms";
 
 type Props = {
@@ -33,20 +35,41 @@ const navGroups = [
         label: "Nhà hàng",
         match: (path: string) => path === "/admin/restaurants" || path.startsWith("/admin/restaurants/"),
       },
+      {
+        href: "/admin/bar",
+        label: "Bar",
+        match: (path: string) => path === "/admin/bar" || path.startsWith("/admin/bar/"),
+      },
+      {
+        href: "/admin/spa",
+        label: "Spa",
+        match: (path: string) => path === "/admin/spa" || path.startsWith("/admin/spa/"),
+      },
+      {
+        href: "/admin/offers",
+        label: "Ưu đãi",
+        match: (path: string) => path === "/admin/offers" || path.startsWith("/admin/offers/"),
+      },
     ],
   },
 ];
 
 export function AdminShell({ children }: Props) {
   const pathname = usePathname();
-  const router = useRouter();
+  const router = useNavRouter();
 
   if (pathname === "/admin/login") {
-    return <AdminToastProvider>{children}</AdminToastProvider>;
+    return (
+      <AdminToastProvider>
+        <DelayedProgress variant="admin" />
+        {children}
+      </AdminToastProvider>
+    );
   }
 
   return (
     <AdminToastProvider>
+      <DelayedProgress variant="admin" />
       <div className="admin-app">
         <aside className="admin-sidebar">
           <div className="admin-brand">

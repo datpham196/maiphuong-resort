@@ -1,11 +1,11 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavRouter } from "@/hooks/use-nav-router";
 import { adminLogin, setAdminToken } from "@/services/admin-rooms";
 
 export default function AdminLoginPage() {
-  const router = useRouter();
+  const router = useNavRouter();
   const [username, setUsername] = useState("admin");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);

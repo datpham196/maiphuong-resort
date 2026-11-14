@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public record AdminRestaurantResponse(
 		UUID id,
+		String kind,
 		int displayOrder,
 		boolean active,
 		String coverImageUrl,

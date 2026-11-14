@@ -60,24 +60,14 @@ public class RestaurantAdminService {
 				.toList();
 	}
 
-	/** Single restaurant page used by admin builder entry. */
+	/** Single venue page used by admin builder entry (restaurant or bar). */
 	@Transactional
-	public AdminRestaurantResponse getPrimary() {
-		return restaurantRepository.findAllByOrderByDisplayOrderAsc().stream()
+	public AdminRestaurantResponse getPrimary(String kind) {
+		String normalizedKind = normalizeKind(kind);
+		return restaurantRepository.findByKindOrderByDisplayOrderAsc(normalizedKind).stream()
 				.findFirst()
 				.map(this::toAdmin)
-				.orElseGet(() -> create(new CreateRestaurantRequest(
-						0,
-						"vi",
-						new RestaurantContentRequest(
-								"nha-hang",
-								"Nhà hàng",
-								null,
-								null,
-								null,
-								null
-						)
-				)));
+				.orElseGet(() -> create(defaultCreateRequest(normalizedKind)));
 	}
 
 	@Transactional(readOnly = true)
@@ -89,9 +79,11 @@ public class RestaurantAdminService {
 	public AdminRestaurantResponse create(CreateRestaurantRequest request) {
 		String locale = request.locale() == null || request.locale().isBlank() ? "vi" : request.locale();
 		validateLocale(locale);
+		String kind = normalizeKind(request.kind());
 
 		Restaurant restaurant = new Restaurant();
-		restaurant.setDisplayOrder(request.displayOrder() == null ? 0 : request.displayOrder());
+		restaurant.setKind(kind);
+		restaurant.setDisplayOrder(request.displayOrder() == null ? defaultDisplayOrder(kind) : request.displayOrder());
 		restaurant.setActive(true);
 		restaurantRepository.save(restaurant);
 
@@ -265,11 +257,44 @@ public class RestaurantAdminService {
 				.toList();
 		return new AdminRestaurantResponse(
 				restaurant.getId(),
+				restaurant.getKind(),
 				restaurant.getDisplayOrder(),
 				restaurant.isActive(),
 				restaurant.getCoverImageUrl(),
 				contents
 		);
+	}
+
+	private CreateRestaurantRequest defaultCreateRequest(String kind) {
+		if ("bar".equals(kind)) {
+			return new CreateRestaurantRequest(
+					defaultDisplayOrder(kind),
+					"vi",
+					kind,
+					new RestaurantContentRequest("bar", "Bar", null, null, null, null)
+			);
+		}
+		return new CreateRestaurantRequest(
+				defaultDisplayOrder(kind),
+				"vi",
+				kind,
+				new RestaurantContentRequest("nha-hang", "Nhà hàng", null, null, null, null)
+		);
+	}
+
+	private int defaultDisplayOrder(String kind) {
+		return "bar".equals(kind) ? 2 : 1;
+	}
+
+	private String normalizeKind(String kind) {
+		if (kind == null || kind.isBlank()) {
+			return "restaurant";
+		}
+		String normalized = kind.trim().toLowerCase(Locale.ROOT);
+		if (!"restaurant".equals(normalized) && !"bar".equals(normalized)) {
+			throw new ApiException(HttpStatus.BAD_REQUEST, "KIND_INVALID", "Kind must be restaurant or bar");
+		}
+		return normalized;
 	}
 
 	private String cmsStatus(RestaurantContent content) {
@@ -281,12 +306,12 @@ public class RestaurantAdminService {
 
 	private Object readJson(String raw) {
 		if (raw == null || raw.isBlank()) {
-			return objectMapper.createObjectNode();
+			return null;
 		}
 		try {
 			return objectMapper.readValue(raw, Object.class);
 		} catch (Exception ex) {
-			return objectMapper.createObjectNode();
+			return null;
 		}
 	}
 

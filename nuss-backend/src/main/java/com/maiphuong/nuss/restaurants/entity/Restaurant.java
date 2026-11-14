@@ -17,6 +17,9 @@ public class Restaurant {
 	@Id
 	private UUID id;
 
+	@Column(nullable = false, length = 20)
+	private String kind = "restaurant";
+
 	@Column(name = "display_order", nullable = false)
 	private int displayOrder = 0;
 
@@ -49,6 +52,14 @@ public class Restaurant {
 
 	public UUID getId() {
 		return id;
+	}
+
+	public String getKind() {
+		return kind;
+	}
+
+	public void setKind(String kind) {
+		this.kind = kind;
 	}
 
 	public int getDisplayOrder() {
