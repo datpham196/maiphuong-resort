@@ -19,6 +19,8 @@ GitHub (1 repo chứa cả project)
 
 **Chi phí:** $0 (free tier). Có giới hạn demo (cold start, upload tạm thời) — xem mục cuối.
 
+> **Vercel Hobby + repo Private:** auto-deploy có thể bị Blocked nếu commit author không phải owner. Demo nên để repo **Public**, hoặc Redeploy bằng đúng account owner.
+
 ---
 
 ## Mục lục
