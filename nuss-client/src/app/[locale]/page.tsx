@@ -8,6 +8,7 @@ import { SiteHeader } from "@/components/site-header";
 import { Link } from "@/i18n/navigation";
 import { getApiBase } from "@/services/api";
 import { fetchPublicExperiences } from "@/services/experiences";
+import { fetchPublicGallery } from "@/services/gallery";
 import { fetchPublicRestaurants } from "@/services/restaurants";
 import { fetchPublicRooms } from "@/services/rooms";
 
@@ -114,22 +115,16 @@ export default async function Home({ params }: Props) {
     },
   ];
 
-  const gallery = [
-    {
-      key: "pool",
-      title: t("gallery1Title"),
-      image:
-        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1200&q=80",
-      alt: t("gallery1ImageAlt"),
-    },
-    {
-      key: "sea",
-      title: t("gallery2Title"),
-      image:
-        "https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=1200&q=80",
-      alt: t("gallery2ImageAlt"),
-    },
-  ];
+  let gallery: { key: string; image: string }[] = [];
+  try {
+    const galleryItems = await fetchPublicGallery(locale);
+    gallery = galleryItems.slice(0, 4).map((item) => ({
+      key: item.id,
+      image: item.url.startsWith("http") ? item.url : `${getApiBase()}${item.url}`,
+    }));
+  } catch {
+    gallery = [];
+  }
 
   return (
     <>
@@ -293,30 +288,26 @@ export default async function Home({ params }: Props) {
           </div>
         </section>
 
-        <section className="home-section" id="gallery" aria-labelledby="home-gallery-title">
-          <div className="home-section-head">
-            <h2 id="home-gallery-title">{t("gallerySectionTitle")}</h2>
-            <Link className="see-more" href="/gallery">
-              {t("seeMore")}
-            </Link>
-          </div>
-          <div className="gallery-preview-grid">
-            {gallery.map((item) => (
-              <article key={item.key}>
-                <div className="preview-photo">
-                  <Image src={item.image} alt={item.alt} fill sizes="(max-width: 720px) 100vw, 50vw" />
-                </div>
-                <h3>{item.title}</h3>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="booking-band" id="booking">
-          <p className="eyebrow">{t("bookingEyebrow")}</p>
-          <h2>{t("bookingTitle")}</h2>
-          <p>{t("bookingBody")}</p>
-        </section>
+        {gallery.length > 0 ? (
+          <section className="home-section" id="gallery" aria-labelledby="home-gallery-title">
+            <div className="home-section-head">
+              <h2 id="home-gallery-title">{t("gallerySectionTitle")}</h2>
+              <Link className="see-more" href="/gallery">
+                {t("seeMore")}
+              </Link>
+            </div>
+            <div className="gallery-preview-grid">
+              {gallery.map((item) => (
+                <article key={item.key}>
+                  <div className="preview-photo">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={item.image} alt="" />
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
       </main>
       <SiteFooter />
     </>

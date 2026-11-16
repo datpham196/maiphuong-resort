@@ -303,6 +303,16 @@
     "previewMissing": "Preview token is missing.",
     "previewInvalid": "Preview token is invalid or expired."
   },
+  "Gallery": {
+    "title": "Guest photo archive",
+    "intro": "Moments from guests at Mai Phuong Resort — curated and updated by the resort team.",
+    "empty": "No photos in the archive yet. Please check back later.",
+    "error": "Could not load the photo archive. Please try again later.",
+    "galleryAria": "Mai Phuong guest photo archive",
+    "close": "Close",
+    "prev": "Previous photo",
+    "next": "Next photo"
+  },
   "Rooms": {
     "title": "Rooms at Mai Phuong Resort",
     "intro": "Available room types with descriptions and photos managed by the resort on this website.",

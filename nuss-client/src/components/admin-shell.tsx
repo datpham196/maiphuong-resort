@@ -50,6 +50,11 @@ const navGroups = [
         label: "Ưu đãi",
         match: (path: string) => path === "/admin/offers" || path.startsWith("/admin/offers/"),
       },
+      {
+        href: "/admin/gallery",
+        label: "Kho ảnh",
+        match: (path: string) => path === "/admin/gallery" || path.startsWith("/admin/gallery/"),
+      },
     ],
   },
 ];

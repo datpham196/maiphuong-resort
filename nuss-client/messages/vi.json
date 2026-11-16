@@ -303,6 +303,16 @@
     "previewMissing": "Thiếu mã xem trước.",
     "previewInvalid": "Mã xem trước không hợp lệ hoặc đã hết hạn."
   },
+  "Gallery": {
+    "title": "Kho lưu trữ hình ảnh khách đến MP",
+    "intro": "Những khoảnh khắc của khách tại Mai Phương Resort — bộ ảnh do resort chọn và cập nhật.",
+    "empty": "Chưa có ảnh trong kho. Vui lòng quay lại sau.",
+    "error": "Không tải được kho ảnh. Thử lại sau.",
+    "galleryAria": "Kho ảnh khách đến Mai Phương",
+    "close": "Đóng",
+    "prev": "Ảnh trước",
+    "next": "Ảnh sau"
+  },
   "Rooms": {
     "title": "Phòng tại Mai Phương Resort",
     "intro": "Các hạng phòng đang mở bán, kèm mô tả và ảnh do resort cập nhật trên website.",

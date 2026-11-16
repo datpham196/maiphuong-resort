@@ -27,6 +27,7 @@ export function SiteFooter() {
     { href: "/restaurants", label: tHeader("restaurants") },
     { href: "/spa", label: tHeader("spa") },
     { href: "/offers", label: tHeader("offers") },
+    { href: "/gallery", label: tHeader("gallery") },
     { href: "/booking", label: tHeader("bookNow") },
   ] as const;
 
