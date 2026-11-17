@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Noto_Sans, Noto_Serif } from "next/font/google";
+import { Libre_Baskerville, Noto_Sans, Noto_Serif } from "next/font/google";
 import "./globals.css";
 
 const notoSans = Noto_Sans({
@@ -14,13 +14,22 @@ const notoSerif = Noto_Serif({
   weight: ["400", "500"],
 });
 
+const libreBaskerville = Libre_Baskerville({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["400", "700"],
+});
+
 type Props = {
   children: ReactNode;
 };
 
 export default function RootLayout({ children }: Props) {
   return (
-    <html lang="vi" className={`${notoSans.variable} ${notoSerif.variable} h-full`}>
+    <html
+      lang="vi"
+      className={`${notoSans.variable} ${notoSerif.variable} ${libreBaskerville.variable} h-full`}
+    >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

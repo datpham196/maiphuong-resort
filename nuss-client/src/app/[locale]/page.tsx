@@ -2,6 +2,7 @@ import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BookingBar } from "@/components/booking-bar";
 import { FeatureSlider } from "@/components/feature-slider";
+import { HomeInquiryForm } from "@/components/home-inquiry-form";
 import { RoomSlider, type RoomSliderItem } from "@/components/room-slider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -132,57 +133,52 @@ export default async function Home({ params }: Props) {
       <main id="top">
         <section className="hero" aria-label={t("heroAria")}>
           <Image
-            src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=2000&q=80"
+            src="/Overview.jpg"
             alt={t("heroImageAlt")}
             fill
             priority
             sizes="100vw"
           />
           <div className="hero-copy">
-            <h1>{t("brand")}</h1>
-            <p>{t("heroSubtitle")}</p>
+            <div className="hero-intro">
+              <p className="hero-eyebrow">{t("heroEyebrow")}</p>
+              <h1>{t("heroTitle")}</h1>
+              <p className="hero-lead">{t("heroLead")}</p>
+              <div className="hero-actions">
+                <Link className="hero-cta is-primary" href="/rooms">
+                  {t("heroCtaRooms")}
+                </Link>
+                <Link className="hero-cta is-ghost" href="/about">
+                  {t("heroCtaAbout")}
+                </Link>
+              </div>
+            </div>
             <BookingBar />
           </div>
         </section>
 
-        <section className="intro">
-          <h2>{t("introTitle")}</h2>
-          <p>{t("introBody")}</p>
-          <div className="intro-contact">
-            <p className="eyebrow">{t("contactEyebrow")}</p>
-            <p>{t("contactHint")}</p>
-            <Link href="/contact">{t("contactLink")}</Link>
-          </div>
-        </section>
-
-        <FeatureSlider />
-
-        <section className="home-section" id="about" aria-labelledby="home-about-title">
-          <div className="home-section-head">
-            <h2 id="home-about-title">{t("aboutSectionTitle")}</h2>
-            <Link className="see-more" href="/about">
-              {t("seeMore")}
-            </Link>
-          </div>
+        <section className="home-section" id="about" aria-label={t("aboutSectionTitle")}>
           <div className="home-preview story">
             <div className="story-photo">
               <Image
-                src="https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?auto=format&fit=crop&w=1600&q=80"
+                src="/index/intro_small.jpg"
                 alt={t("aboutPreviewImageAlt")}
                 fill
                 sizes="(max-width: 980px) 100vw, 58vw"
               />
             </div>
-            <div>
-              <p className="eyebrow">{t("aboutPreviewEyebrow")}</p>
+            <div className="story-copy">
               <h3>{t("aboutPreviewTitle")}</h3>
               <p>{t("aboutPreviewText")}</p>
-              <Link className="text-link" href="/about">
-                {t("seeMore")}
+              <p>{t("aboutPreviewText2")}</p>
+              <Link className="story-cta" href="/about">
+                {t("aboutPreviewCta")}
               </Link>
             </div>
           </div>
         </section>
+
+        <FeatureSlider />
 
         <section className="home-section is-cream" id="experiences" aria-labelledby="home-experiences-title">
           <div className="home-section-head">
@@ -308,6 +304,15 @@ export default async function Home({ params }: Props) {
             </div>
           </section>
         ) : null}
+
+        <section className="inquiry-band" id="inquiry" aria-labelledby="home-inquiry-title">
+          <div className="inquiry-band-inner">
+            <p className="eyebrow">{t("inquiryEyebrow")}</p>
+            <h2 id="home-inquiry-title">{t("inquiryTitle")}</h2>
+            <p>{t("inquiryBody")}</p>
+            <HomeInquiryForm />
+          </div>
+        </section>
       </main>
       <SiteFooter />
     </>

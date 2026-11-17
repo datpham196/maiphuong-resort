@@ -367,6 +367,9 @@ public class BookingService {
 				bookingIds
 		);
 
+		// Use pre-cancel snapshot so guest email/details remain available for notification.
+		bookingMailService.sendCancellationEmails(current);
+
 		try {
 			return lookupByReference(ref, locale);
 		} catch (ApiException ex) {

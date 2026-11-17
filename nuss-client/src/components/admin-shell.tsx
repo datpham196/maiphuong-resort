@@ -15,7 +15,14 @@ type Props = {
 const navGroups = [
   {
     label: "Tổng quan",
-    items: [{ href: "/admin", label: "Dashboard", match: (path: string) => path === "/admin" }],
+    items: [
+      { href: "/admin", label: "Dashboard", match: (path: string) => path === "/admin" },
+      {
+        href: "/admin/inquiries",
+        label: "Câu hỏi khách",
+        match: (path: string) => path === "/admin/inquiries" || path.startsWith("/admin/inquiries/"),
+      },
+    ],
   },
   {
     label: "Nội dung",

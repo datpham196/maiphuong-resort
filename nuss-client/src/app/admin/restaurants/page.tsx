@@ -1,15 +1,14 @@
 "use client";
 
-import { AdminVenueBuilderPage } from "@/components/admin-venue-builder-page";
+import { AdminRestaurantCmsPage } from "@/components/admin-restaurant-cms-page";
 
 export default function AdminRestaurantsPage() {
   return (
-    <AdminVenueBuilderPage
+    <AdminRestaurantCmsPage
       kind="restaurant"
       title="Nhà hàng"
-      description="Chỉnh nội dung trang giới thiệu nhà hàng trên website."
+      description="Cập nhật ảnh và thực đơn trang nhà hàng trên website."
       adminPath="/admin/restaurants"
-      loadingLabel="Đang mở trang Nhà hàng…"
     />
   );
 }

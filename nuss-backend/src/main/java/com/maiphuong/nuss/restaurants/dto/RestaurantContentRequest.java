@@ -6,6 +6,13 @@ public record RestaurantContentRequest(
 		String shortDescription,
 		String seoTitle,
 		String seoDescription,
-		Object documentDraft
+		String heroSubtitle,
+		String introEyebrow,
+		String introHeading,
+		String introBody,
+		String introBodySecondary,
+		String menuSectionEyebrow,
+		String menuSectionHeading,
+		String menuSectionLead
 ) {
 }

@@ -29,9 +29,13 @@ export default async function RestaurantsPage({ params }: Props) {
     loadError = true;
   }
 
-  // Single published page → open it directly; list only when there are 2+.
+  // Single published venue → open it directly; list when there are 2+ (restaurant + bar).
   if (!loadError && items.length === 1 && items[0]?.slug) {
-    redirect({ href: `/restaurants/${items[0].slug}`, locale });
+    const only = items[0];
+    redirect({
+      href: only.kind === "bar" ? "/bar" : `/restaurants/${only.slug}`,
+      locale,
+    });
   }
 
   return (
@@ -50,7 +54,7 @@ export default async function RestaurantsPage({ params }: Props) {
 
           <section className="restaurants-list" aria-label={t("title")}>
             {items.map((item) => {
-              const href = `/restaurants/${item.slug}`;
+              const href = item.kind === "bar" ? "/bar" : `/restaurants/${item.slug}`;
               const image = coverSrc(item.coverImageUrl);
               return (
                 <article key={item.id} className="restaurant-row">

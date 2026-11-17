@@ -9,7 +9,8 @@ public record AdminRestaurantResponse(
 		int displayOrder,
 		boolean active,
 		String coverImageUrl,
-		List<Content> contents
+		List<Content> contents,
+		List<RestaurantImageResponse> images
 ) {
 	public record Content(
 			String locale,
@@ -18,8 +19,14 @@ public record AdminRestaurantResponse(
 			String shortDescription,
 			String seoTitle,
 			String seoDescription,
-			Object documentDraft,
-			Object documentPublished,
+			String heroSubtitle,
+			String introEyebrow,
+			String introHeading,
+			String introBody,
+			String introBodySecondary,
+			String menuSectionEyebrow,
+			String menuSectionHeading,
+			String menuSectionLead,
 			boolean published,
 			String cmsStatus
 	) {

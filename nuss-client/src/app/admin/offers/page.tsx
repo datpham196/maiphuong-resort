@@ -1,16 +1,25 @@
 "use client";
 
-import { AdminCmsPageBuilderPage } from "@/components/admin-cms-page-builder-page";
-
 export default function AdminOffersPage() {
   return (
-    <AdminCmsPageBuilderPage
-      pageKey="offers"
-      title="Ưu đãi"
-      description="Chỉnh nội dung trang Ưu đãi trên website. Chỉ một bài viết — đường dẫn cố định /offers."
-      adminPath="/admin/offers"
-      publicPath="/offers"
-      loadingLabel="Đang mở trang Ưu đãi…"
-    />
+    <div className="dash">
+      <div className="dash-head">
+        <div>
+          <h1>Ưu đãi</h1>
+          <p>
+            Trang Ưu đãi đang dùng giao diện hard-code trên website. Phần chỉnh sửa nội dung admin sẽ bổ sung sau —
+            tạm thời không dùng Page Builder / tạo bài viết.
+          </p>
+        </div>
+        <a className="admin-btn is-primary" href="/vi/offers" target="_blank" rel="noreferrer">
+          Xem trang public
+        </a>
+      </div>
+      <section className="dash-panel">
+        <p className="admin-muted" style={{ margin: 0 }}>
+          Khi chốt cấu trúc CMS cho Ưu đãi (gói, ngày áp dụng, giá…), sẽ thay hard-code bằng form quản trị.
+        </p>
+      </section>
+    </div>
   );
 }

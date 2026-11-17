@@ -44,6 +44,30 @@ public class RestaurantContent {
 	@Column(name = "seo_description")
 	private String seoDescription;
 
+	@Column(name = "hero_subtitle")
+	private String heroSubtitle;
+
+	@Column(name = "intro_eyebrow", length = 200)
+	private String introEyebrow;
+
+	@Column(name = "intro_heading", length = 300)
+	private String introHeading;
+
+	@Column(name = "intro_body")
+	private String introBody;
+
+	@Column(name = "intro_body_secondary")
+	private String introBodySecondary;
+
+	@Column(name = "menu_section_eyebrow", length = 200)
+	private String menuSectionEyebrow;
+
+	@Column(name = "menu_section_heading", length = 300)
+	private String menuSectionHeading;
+
+	@Column(name = "menu_section_lead")
+	private String menuSectionLead;
+
 	@JdbcTypeCode(SqlTypes.JSON)
 	@Column(name = "document_draft", nullable = false, columnDefinition = "jsonb")
 	private String documentDraft =
@@ -138,6 +162,70 @@ public class RestaurantContent {
 
 	public void setSeoDescription(String seoDescription) {
 		this.seoDescription = seoDescription;
+	}
+
+	public String getHeroSubtitle() {
+		return heroSubtitle;
+	}
+
+	public void setHeroSubtitle(String heroSubtitle) {
+		this.heroSubtitle = heroSubtitle;
+	}
+
+	public String getIntroEyebrow() {
+		return introEyebrow;
+	}
+
+	public void setIntroEyebrow(String introEyebrow) {
+		this.introEyebrow = introEyebrow;
+	}
+
+	public String getIntroHeading() {
+		return introHeading;
+	}
+
+	public void setIntroHeading(String introHeading) {
+		this.introHeading = introHeading;
+	}
+
+	public String getIntroBody() {
+		return introBody;
+	}
+
+	public void setIntroBody(String introBody) {
+		this.introBody = introBody;
+	}
+
+	public String getIntroBodySecondary() {
+		return introBodySecondary;
+	}
+
+	public void setIntroBodySecondary(String introBodySecondary) {
+		this.introBodySecondary = introBodySecondary;
+	}
+
+	public String getMenuSectionEyebrow() {
+		return menuSectionEyebrow;
+	}
+
+	public void setMenuSectionEyebrow(String menuSectionEyebrow) {
+		this.menuSectionEyebrow = menuSectionEyebrow;
+	}
+
+	public String getMenuSectionHeading() {
+		return menuSectionHeading;
+	}
+
+	public void setMenuSectionHeading(String menuSectionHeading) {
+		this.menuSectionHeading = menuSectionHeading;
+	}
+
+	public String getMenuSectionLead() {
+		return menuSectionLead;
+	}
+
+	public void setMenuSectionLead(String menuSectionLead) {
+		this.menuSectionLead = menuSectionLead;
 	}
 
 	public String getDocumentDraft() {

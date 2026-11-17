@@ -166,6 +166,20 @@ export function BookingLookupView({ initialRef = "" }: Props) {
     }
   }
 
+  function paymentStatusLabel(status: string | null | undefined) {
+    if (status == null || status === "") {
+      return "—";
+    }
+    const value = String(status).trim().toLowerCase();
+    if (value === "pending") {
+      return t("paymentStatusPayAtHotel");
+    }
+    if (value === "paid") {
+      return t("paymentStatusPaid");
+    }
+    return status;
+  }
+
   return (
     <main className="booking-lookup-page">
       <header className="booking-lookup-hero">
@@ -270,7 +284,7 @@ export function BookingLookupView({ initialRef = "" }: Props) {
               ) : null}
               <div>
                 <dt>{t("paymentStatus")}</dt>
-                <dd>{booking.paymentStatus || "—"}</dd>
+                <dd>{paymentStatusLabel(booking.paymentStatus)}</dd>
               </div>
               <div>
                 <dt>{t("totalAmount")}</dt>
@@ -279,10 +293,6 @@ export function BookingLookupView({ initialRef = "" }: Props) {
               <div>
                 <dt>{t("totalPaid")}</dt>
                 <dd>{formatMoney(booking.totalPaid, booking.currency, locale)}</dd>
-              </div>
-              <div>
-                <dt>{t("totalRemaining")}</dt>
-                <dd>{formatMoney(booking.totalRemaining, booking.currency, locale)}</dd>
               </div>
               {booking.created ? (
                 <div>

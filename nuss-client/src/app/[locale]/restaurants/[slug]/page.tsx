@@ -1,12 +1,10 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { PageRenderer } from "@/components/page-builder/render/PageRenderer";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { Link } from "@/i18n/navigation";
+import { RestaurantDetailView } from "@/components/restaurant-detail-view";
 import { ApiError } from "@/services/api";
-import { fetchPublicRestaurant, fetchPublicRestaurants } from "@/services/restaurants";
-import "@/styles/page-builder.css";
+import { fetchPublicRestaurant } from "@/services/restaurants";
 import "@/styles/restaurants.css";
 
 type Props = {
@@ -16,7 +14,6 @@ type Props = {
 export default async function RestaurantDetailPage({ params }: Props) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("Restaurants");
 
   let item;
   try {
@@ -28,36 +25,11 @@ export default async function RestaurantDetailPage({ params }: Props) {
     throw err;
   }
 
-  let publishedCount = 1;
-  try {
-    publishedCount = (await fetchPublicRestaurants(locale)).length;
-  } catch {
-    publishedCount = 1;
-  }
-  const showListBack = publishedCount > 1;
-
   return (
     <>
-      <SiteHeader tone="on-light" />
+      <SiteHeader tone="over-hero" />
       <div className="restaurants-shell">
-        <main className="restaurant-detail-page">
-          {showListBack ? (
-            <Link className="restaurant-detail-back" href="/restaurants">
-              {t("backToList")}
-            </Link>
-          ) : (
-            <Link className="restaurant-detail-back" href="/">
-              {t("backHome")}
-            </Link>
-          )}
-          <section className="restaurant-detail-hero">
-            <h1>{item.title}</h1>
-            {item.shortDescription ? <p className="restaurant-detail-lead">{item.shortDescription}</p> : null}
-          </section>
-          <div className="restaurant-document">
-            <PageRenderer document={item.document} mode="live" />
-          </div>
-        </main>
+        <RestaurantDetailView item={item} locale={locale} />
         <SiteFooter />
       </div>
     </>

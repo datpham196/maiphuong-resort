@@ -1,16 +1,16 @@
 package com.maiphuong.nuss.restaurants.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maiphuong.nuss.pagebuilder.DocumentValidator;
 import com.maiphuong.nuss.restaurants.dto.AdminRestaurantResponse;
 import com.maiphuong.nuss.restaurants.dto.CreateRestaurantRequest;
-import com.maiphuong.nuss.restaurants.dto.MediaUploadResponse;
-import com.maiphuong.nuss.restaurants.dto.PreviewTokenResponse;
 import com.maiphuong.nuss.restaurants.dto.RestaurantContentRequest;
+import com.maiphuong.nuss.restaurants.dto.RestaurantImageResponse;
 import com.maiphuong.nuss.restaurants.dto.UpdateRestaurantRequest;
 import com.maiphuong.nuss.restaurants.entity.Restaurant;
 import com.maiphuong.nuss.restaurants.entity.RestaurantContent;
+import com.maiphuong.nuss.restaurants.entity.RestaurantImage;
 import com.maiphuong.nuss.restaurants.repository.RestaurantContentRepository;
+import com.maiphuong.nuss.restaurants.repository.RestaurantImageRepository;
 import com.maiphuong.nuss.restaurants.repository.RestaurantRepository;
 import com.maiphuong.nuss.rooms.service.ImageStorageService;
 import com.maiphuong.nuss.shared.api.ApiException;
@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -29,28 +30,24 @@ import java.util.regex.Pattern;
 public class RestaurantAdminService {
 
 	private static final Pattern SLUG_PATTERN = Pattern.compile("^[a-z0-9]+(?:-[a-z0-9]+)*$");
+	private static final Set<String> IMAGE_ROLES = Set.of("slide", "main", "signature", "menu");
+	private static final Set<String> SINGLE_ROLES = Set.of("main", "signature");
 
 	private final RestaurantRepository restaurantRepository;
 	private final RestaurantContentRepository contentRepository;
+	private final RestaurantImageRepository imageRepository;
 	private final ImageStorageService imageStorageService;
-	private final DocumentValidator documentValidator;
-	private final RestaurantPreviewTokenService previewTokenService;
-	private final ObjectMapper objectMapper;
 
 	public RestaurantAdminService(
 			RestaurantRepository restaurantRepository,
 			RestaurantContentRepository contentRepository,
-			ImageStorageService imageStorageService,
-			DocumentValidator documentValidator,
-			RestaurantPreviewTokenService previewTokenService,
-			ObjectMapper objectMapper
+			RestaurantImageRepository imageRepository,
+			ImageStorageService imageStorageService
 	) {
 		this.restaurantRepository = restaurantRepository;
 		this.contentRepository = contentRepository;
+		this.imageRepository = imageRepository;
 		this.imageStorageService = imageStorageService;
-		this.documentValidator = documentValidator;
-		this.previewTokenService = previewTokenService;
-		this.objectMapper = objectMapper;
 	}
 
 	@Transactional(readOnly = true)
@@ -60,7 +57,6 @@ public class RestaurantAdminService {
 				.toList();
 	}
 
-	/** Single venue page used by admin builder entry (restaurant or bar). */
 	@Transactional
 	public AdminRestaurantResponse getPrimary(String kind) {
 		String normalizedKind = normalizeKind(kind);
@@ -156,8 +152,6 @@ public class RestaurantAdminService {
 		if (contentRepository.existsByLocaleAndSlugAndRestaurantIdNot(locale, slug, id)) {
 			throw new ApiException(HttpStatus.CONFLICT, "SLUG_TAKEN", "Slug already used for this locale");
 		}
-		documentValidator.validateOrThrow(content.getDocumentDraft());
-		content.setDocumentPublished(content.getDocumentDraft());
 		content.setPublished(true);
 		content.setPublishedAt(Instant.now());
 		contentRepository.save(content);
@@ -176,20 +170,37 @@ public class RestaurantAdminService {
 	}
 
 	@Transactional
-	public MediaUploadResponse uploadMedia(UUID id, MultipartFile file) {
-		requireRestaurant(id);
+	public RestaurantImageResponse uploadImage(UUID id, String role, MultipartFile file, String altText) {
+		String normalizedRole = normalizeImageRole(role);
+		Restaurant restaurant = requireRestaurant(id);
+		if (SINGLE_ROLES.contains(normalizedRole)) {
+			List<RestaurantImage> existing = imageRepository.findByRestaurantIdAndRoleOrderByDisplayOrderAsc(id, normalizedRole);
+			for (RestaurantImage image : existing) {
+				imageRepository.delete(image);
+			}
+		}
 		ImageStorageService.StoredFile stored = imageStorageService.store("restaurants", id, file);
-		return new MediaUploadResponse(stored.publicUrl(), stored.storageKey());
+		RestaurantImage image = new RestaurantImage();
+		image.setRestaurant(restaurant);
+		image.setRole(normalizedRole);
+		image.setImageUrl(stored.publicUrl());
+		image.setStorageKey(stored.storageKey());
+		image.setAltText(blankToNull(altText));
+		int order = (int) imageRepository.countByRestaurantIdAndRole(id, normalizedRole);
+		image.setDisplayOrder(order);
+		imageRepository.save(image);
+		if ("slide".equals(normalizedRole) && blankToNull(restaurant.getCoverImageUrl()) == null) {
+			restaurant.setCoverImageUrl(stored.publicUrl());
+			restaurantRepository.save(restaurant);
+		}
+		return toImage(image);
 	}
 
-	@Transactional(readOnly = true)
-	public PreviewTokenResponse createPreviewToken(UUID id, String locale) {
-		validateLocale(locale);
-		requireRestaurant(id);
-		contentRepository.findByRestaurantIdAndLocale(id, locale)
-				.orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "CONTENT_MISSING", "Content for locale is missing"));
-		String token = previewTokenService.issue(id, locale);
-		return new PreviewTokenResponse(token, RestaurantPreviewTokenService.TTL_SECONDS);
+	@Transactional
+	public void deleteImage(UUID id, UUID imageId) {
+		RestaurantImage image = imageRepository.findByIdAndRestaurantId(imageId, id)
+				.orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "IMAGE_NOT_FOUND", "Image not found"));
+		imageRepository.delete(image);
 	}
 
 	private void upsertContentInternal(Restaurant restaurant, String locale, RestaurantContentRequest request) {
@@ -226,16 +237,29 @@ public class RestaurantAdminService {
 		if (request.seoDescription() != null) {
 			content.setSeoDescription(blankToNull(request.seoDescription()));
 		}
-		if (request.documentDraft() != null) {
-			String json;
-			try {
-				json = objectMapper.writeValueAsString(request.documentDraft());
-				// Soft parse check only; full block rules run on publish.
-				objectMapper.readTree(json);
-			} catch (Exception ex) {
-				throw new ApiException(HttpStatus.BAD_REQUEST, "DOCUMENT_PARSE", "Invalid documentDraft");
-			}
-			content.setDocumentDraft(json);
+		if (request.heroSubtitle() != null) {
+			content.setHeroSubtitle(blankToNull(request.heroSubtitle()));
+		}
+		if (request.introEyebrow() != null) {
+			content.setIntroEyebrow(blankToNull(request.introEyebrow()));
+		}
+		if (request.introHeading() != null) {
+			content.setIntroHeading(blankToNull(request.introHeading()));
+		}
+		if (request.introBody() != null) {
+			content.setIntroBody(blankToNull(request.introBody()));
+		}
+		if (request.introBodySecondary() != null) {
+			content.setIntroBodySecondary(blankToNull(request.introBodySecondary()));
+		}
+		if (request.menuSectionEyebrow() != null) {
+			content.setMenuSectionEyebrow(blankToNull(request.menuSectionEyebrow()));
+		}
+		if (request.menuSectionHeading() != null) {
+			content.setMenuSectionHeading(blankToNull(request.menuSectionHeading()));
+		}
+		if (request.menuSectionLead() != null) {
+			content.setMenuSectionLead(blankToNull(request.menuSectionLead()));
 		}
 		contentRepository.save(content);
 	}
@@ -249,11 +273,22 @@ public class RestaurantAdminService {
 						c.getShortDescription(),
 						c.getSeoTitle(),
 						c.getSeoDescription(),
-						readJson(c.getDocumentDraft()),
-						readJson(c.getDocumentPublished()),
+						c.getHeroSubtitle(),
+						c.getIntroEyebrow(),
+						c.getIntroHeading(),
+						c.getIntroBody(),
+						c.getIntroBodySecondary(),
+						c.getMenuSectionEyebrow(),
+						c.getMenuSectionHeading(),
+						c.getMenuSectionLead(),
 						c.isPublished(),
 						cmsStatus(c)
 				))
+				.toList();
+		List<RestaurantImageResponse> images = imageRepository
+				.findByRestaurantIdOrderByRoleAscDisplayOrderAsc(restaurant.getId())
+				.stream()
+				.map(this::toImage)
 				.toList();
 		return new AdminRestaurantResponse(
 				restaurant.getId(),
@@ -261,7 +296,18 @@ public class RestaurantAdminService {
 				restaurant.getDisplayOrder(),
 				restaurant.isActive(),
 				restaurant.getCoverImageUrl(),
-				contents
+				contents,
+				images
+		);
+	}
+
+	private RestaurantImageResponse toImage(RestaurantImage image) {
+		return new RestaurantImageResponse(
+				image.getId(),
+				image.getRole(),
+				image.getImageUrl(),
+				image.getAltText(),
+				image.getDisplayOrder()
 		);
 	}
 
@@ -271,14 +317,20 @@ public class RestaurantAdminService {
 					defaultDisplayOrder(kind),
 					"vi",
 					kind,
-					new RestaurantContentRequest("bar", "Bar", null, null, null, null)
+					new RestaurantContentRequest(
+							"bar", "Bar", null, null, null,
+							null, null, null, null, null, null, null, null
+					)
 			);
 		}
 		return new CreateRestaurantRequest(
 				defaultDisplayOrder(kind),
 				"vi",
 				kind,
-				new RestaurantContentRequest("nha-hang", "Nhà hàng", null, null, null, null)
+				new RestaurantContentRequest(
+						"nha-hang", "Nhà hàng", null, null, null,
+						null, null, null, null, null, null, null, null
+				)
 		);
 	}
 
@@ -297,22 +349,22 @@ public class RestaurantAdminService {
 		return normalized;
 	}
 
+	private String normalizeImageRole(String role) {
+		if (role == null || role.isBlank()) {
+			throw new ApiException(HttpStatus.BAD_REQUEST, "ROLE_REQUIRED", "Image role is required");
+		}
+		String normalized = role.trim().toLowerCase(Locale.ROOT);
+		if (!IMAGE_ROLES.contains(normalized)) {
+			throw new ApiException(HttpStatus.BAD_REQUEST, "ROLE_INVALID", "Image role must be slide, main, signature or menu");
+		}
+		return normalized;
+	}
+
 	private String cmsStatus(RestaurantContent content) {
 		if (blankToNull(content.getTitle()) == null && blankToNull(content.getSlug()) == null) {
 			return "Missing";
 		}
 		return content.isPublished() ? "Published" : "Draft";
-	}
-
-	private Object readJson(String raw) {
-		if (raw == null || raw.isBlank()) {
-			return null;
-		}
-		try {
-			return objectMapper.readValue(raw, Object.class);
-		} catch (Exception ex) {
-			return null;
-		}
 	}
 
 	private Restaurant requireRestaurant(UUID id) {

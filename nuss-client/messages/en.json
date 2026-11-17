@@ -14,7 +14,7 @@
     "about": "About",
     "experiences": "Destinations / tours / park tickets",
     "rooms": "Rooms",
-    "restaurants": "Restaurants",
+    "restaurants": "Dining",
     "spa": "Spa",
     "offers": "Offers",
     "gallery": "Guest photo archive",
@@ -23,10 +23,15 @@
     "bookingSearchSubmit": "Look up booking"
   },
   "Home": {
-    "brand": "Mai Phuong Resort",
+    "brand": "Mai Phuong Resort PQ",
     "heroAria": "About Mai Phuong Resort Phu Quoc",
-    "heroImageAlt": "Clear water and a shoreline in Phu Quoc",
+    "heroImageAlt": "Aerial view of Mai Phuong Resort",
     "heroSubtitle": "Resort in Phu Quoc",
+    "heroEyebrow": "Welcome to Mai Phuong Resort • Phu Quoc",
+    "heroTitle": "Your Home, No Matter Where You're From.",
+    "heroLead": "Between tropical gardens and the blue sea of Vung Bau, every day at Mai Phuong is an invitation to slow down and savor.",
+    "heroCtaRooms": "Explore rooms →",
+    "heroCtaAbout": "The Mai Phuong story",
     "introTitle": "A quiet stay on Pearl Island",
     "introBody": "Mai Phuong Resort welcomes guests on Phu Quoc with private space, sea light, and meals on the grounds. From this page you can browse rooms, restaurants, spa, island tours, and park tickets. Direct bookings will enter the hotel system once the API docs are ready.",
     "contactEyebrow": "Contact",
@@ -57,9 +62,11 @@
     "seeDetails": "View details →",
     "aboutSectionTitle": "About the resort",
     "aboutPreviewEyebrow": "Mai Phuong Resort Phu Quoc",
-    "aboutPreviewTitle": "A place to pause on Pearl Island",
-    "aboutPreviewText": "Mai Phuong Resort sits on Phu Quoc at a slower pace by the sea: bright rooms, dining on the grounds, spa, and day trips around the island.",
-    "aboutPreviewImageAlt": "A tropical resort pool under palm trees",
+    "aboutPreviewTitle": "A place to return to, in the heart of Phu Quoc.",
+    "aboutPreviewText": "At Mai Phuong, the quiet beauty of Vung Bau beach blends with cool green gardens to create a stay that feels close, calm, and restorative.",
+    "aboutPreviewText2": "From peaceful sleep and seaside meals to restorative body treatments, we cherish every moment of your holiday.",
+    "aboutPreviewCta": "Discover Mai Phuong →",
+    "aboutPreviewImageAlt": "Aerial view of Mai Phuong Resort by the sea",
     "experiencesSectionTitle": "Destinations / tours / park tickets",
     "experience1Title": "Sao Beach and the southern shore",
     "experience1Text": "White sand, shallow water, and a calm beach mood near the resort.",
@@ -119,7 +126,26 @@
     "gallery1Title": "Grounds and pool",
     "gallery1ImageAlt": "Resort photo with a pool and greenery",
     "gallery2Title": "Sea light on Pearl Island",
-    "gallery2ImageAlt": "A bright tropical shoreline photo"
+    "gallery2ImageAlt": "A bright tropical shoreline photo",
+    "inquiryEyebrow": "Ask privately",
+    "inquiryTitle": "Send a question to Mai Phuong Resort",
+    "inquiryBody": "Use the form below. Your question goes privately to the resort — it is not published on the website."
+  },
+  "Inquiry": {
+    "name": "Full name",
+    "email": "Email",
+    "phone": "Phone",
+    "phoneOptional": "Optional",
+    "question": "Your question",
+    "submit": "Send question",
+    "submitting": "Sending…",
+    "success": "Your question was sent. The resort will reply by email or phone.",
+    "askAgain": "Ask another question",
+    "errorGeneric": "Could not send. Please try again.",
+    "errorNameRequired": "Please enter your full name.",
+    "errorEmailRequired": "Please enter your email.",
+    "errorEmailInvalid": "Please enter a valid email address.",
+    "errorQuestionRequired": "Please enter your question."
   },
   "BookingBar": {
     "aria": "Check availability",
@@ -278,30 +304,144 @@
     }
   },
   "Restaurants": {
-    "title": "Restaurants at Mai Phuong Resort",
-    "intro": "An introduction to dining spaces on the grounds — for browsing only, not online reservations.",
-    "empty": "No restaurants to show yet. Please check back later.",
-    "error": "Could not load restaurants. Please try again later.",
+    "title": "Dining at Mai Phuong Resort",
+    "intro": "Restaurant and Beach Bar on the grounds — for browsing only, not online reservations.",
+    "empty": "No dining venues to show yet. Please check back later.",
+    "error": "Could not load dining venues. Please try again later.",
     "viewDetails": "View details →",
-    "backToList": "← All restaurants",
+    "backToList": "← Dining",
     "backHome": "← Home",
     "kindRestaurant": "Restaurant",
-    "kindBar": "Bar",
-    "previewBadge": "Preview (draft)",
-    "previewMissing": "Preview token is missing.",
-    "previewInvalid": "Preview token is invalid or expired."
+    "kindBar": "Beach Bar",
+    "viewFullMenu": "View full menu",
+    "menuEmpty": "The menu will be updated soon.",
+    "menuGalleryAria": "Menu photos",
+    "heroSliderAria": "Restaurant photo slides",
+    "heroPrev": "Previous photo",
+    "heroNext": "Next photo",
+    "heroDotsAria": "Choose a photo",
+    "heroGoTo": "Photo {index}",
+    "lightboxClose": "Close",
+    "lightboxPrev": "Previous photo",
+    "lightboxNext": "Next photo",
+    "previewRemoved": "Draft preview is no longer used for restaurants. Publish content from the admin page.",
+    "detail": {
+      "restaurant": {
+        "heroEyebrow": "The dining experience",
+        "heroTitle": "Mai Phuong Restaurant",
+        "heroLead": "",
+        "introEyebrow": "The dining experience",
+        "introHeading": "Mai Phuong Restaurant",
+        "introBody": "Under the chef’s careful hand, seafood at Mai Phuong becomes rich and fragrant — the taste of the sea brought close to every table.",
+        "introBodySecondary": "On-property dining from breakfast through dinner — for browsing only, not online reservations.",
+        "contactCta": "",
+        "contactHref": "",
+        "imagePlaceholder": "Restaurant photo",
+        "menuEyebrow": "Our menu",
+        "menuHeading": "Explore the menu.",
+        "menuLead": "An online menu by group — dishes and prices can be updated without replacing PDF images.",
+        "viewFullMenu": "View full menu"
+      },
+      "bar": {
+        "heroEyebrow": "Beach Bar",
+        "heroTitle": "Sip by the Sea.",
+        "heroLead": "Favorite drinks, a soft sea breeze, and conversations that never quite end.",
+        "introEyebrow": "Good drinks · Ocean breeze",
+        "introHeading": "A calm corner by the sea.",
+        "introBody": "A cool drink and time for yourself, friends, or someone you love make every seaside moment feel complete.",
+        "introBodySecondary": "This bar page is for the drinks menu, space photos, current events, and opening hours.",
+        "contactCta": "Contact the bar —",
+        "contactHref": "tel:+84932852185",
+        "imagePlaceholder": "Real bar / drinks photo",
+        "menuEyebrow": "Our drinks",
+        "menuHeading": "Explore the drinks menu.",
+        "menuLead": "Drinks can be updated by season without replacing menu photos.",
+        "viewFullMenu": "View full drinks menu"
+      }
+    }
   },
   "Spa": {
     "backHome": "← Home",
-    "previewBadge": "Preview (draft)",
-    "previewMissing": "Preview token is missing.",
-    "previewInvalid": "Preview token is invalid or expired."
+    "previewRemoved": "Draft preview is no longer used for Spa. The page is hard-coded to the UI mockup.",
+    "heroEyebrow": "Spa & Wellness",
+    "heroTitle": "Your Moment of Calm.",
+    "heroLead": "Take time to rest, ease your body, and return to balance during your stay in Phu Quoc.",
+    "introEyebrow": "Restore your balance",
+    "introHeading": "Touch a quieter pace.",
+    "introBody": "Each treatment at Mai Phuong is a quiet pause in the day — a chance to unwind after travel and exploring Pearl Island.",
+    "introBodySecondary": "The spa page focuses on treatment rooms, care moments, duration, and clear pricing — for browsing only.",
+    "introImageAlt": "A calm spa / massage room with soft light",
+    "bookCta": "Book a massage →",
+    "bookHref": "tel:+84932852185",
+    "treatmentsEyebrow": "Treatments",
+    "treatmentsHeading": "Choose a fitting treatment.",
+    "treatmentsLead": "The groups below are a suggested structure; only list services currently offered.",
+    "treatments": {
+      "body": {
+        "category": "Massage",
+        "title": "Body Massage",
+        "text": "A full-body treatment to ease tension after beach days or island tours.",
+        "tag1": "Body ease",
+        "tag2": "Price updates",
+        "cta": "View treatment →"
+      },
+      "foot": {
+        "category": "Massage",
+        "title": "Foot Massage",
+        "text": "Gentle care for feet and ankles after long walks and travel days.",
+        "tag1": "Foot ease",
+        "tag2": "Price updates",
+        "cta": "View treatment →"
+      },
+      "other": {
+        "category": "Optional",
+        "title": "Other Treatments",
+        "text": "Additional options on request — details will be updated when services are ready.",
+        "tag1": "On request",
+        "tag2": "Price updates",
+        "cta": "Details →"
+      }
+    },
+    "bannerTitle": "Take a moment for yourself.",
+    "bannerText": "A little body care can make the whole journey feel lighter.",
+    "bannerCta": "Book spa →",
+    "consultCta": "Ask now",
+    "consultHref": "tel:+84932852185"
   },
   "Offers": {
     "backHome": "← Home",
-    "previewBadge": "Preview (draft)",
-    "previewMissing": "Preview token is missing.",
-    "previewInvalid": "Preview token is invalid or expired."
+    "previewRemoved": "Draft preview is no longer used for Offers. The page is hard-coded to the UI mockup.",
+    "heroEyebrow": "Special Offers",
+    "heroTitle": "More to Enjoy.",
+    "heroLead": "Flexible stay ideas that combine lodging, dining, and body care. The packages below are concepts — not live promotions.",
+    "conceptBadge": "Concept only",
+    "viewPackage": "View package →",
+    "cards": {
+      "stayLonger": {
+        "title": "Stay Longer, Enjoy More",
+        "text": "A longer-stay idea with added value for guests who book direct.",
+        "tag1": "Dates: to confirm",
+        "tag2": "Price: updates"
+      },
+      "stayRelax": {
+        "title": "Stay & Relax",
+        "text": "A concept that pairs a seaside stay with spa time.",
+        "tag1": "Dates: to confirm",
+        "tag2": "Price: updates"
+      },
+      "stayDine": {
+        "title": "Stay & Dine",
+        "text": "A stay idea that adds a seaside restaurant experience.",
+        "tag1": "Dates: to confirm",
+        "tag2": "Price: updates"
+      },
+      "family": {
+        "title": "Family Escape",
+        "text": "A family-minded stay idea for different lodging needs.",
+        "tag1": "Dates: to confirm",
+        "tag2": "Price: updates"
+      }
+    }
   },
   "Gallery": {
     "title": "Guest photo archive",
@@ -446,6 +586,8 @@
     "idDocument": "ID document",
     "address": "Address",
     "paymentStatus": "Payment status",
+    "paymentStatusPayAtHotel": "Pay at hotel",
+    "paymentStatusPaid": "Paid",
     "totalAmount": "Total amount",
     "totalPaid": "Paid",
     "totalRemaining": "Remaining",
