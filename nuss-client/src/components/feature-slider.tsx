@@ -2,18 +2,24 @@
 
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
-import { Link } from "@/i18n/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 
 type Slide = {
   key: string;
-  eyebrow: string;
+  sense: string;
+  subtitle: string;
   title: string;
-  href: string;
-  linkLabel: string;
+  body: string;
+  offer?: string;
   image: string;
   alt: string;
+  /** Text block side — listen/touch follow the sample on the right. */
+  align: "left" | "right";
 };
+
+function padSlideIndex(value: number) {
+  return String(value).padStart(2, "0");
+}
 
 export function FeatureSlider() {
   const t = useTranslations("Home");
@@ -25,38 +31,62 @@ export function FeatureSlider() {
   const [paused, setPaused] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
 
-  const slides: Slide[] = [
-    {
-      key: "spa",
-      eyebrow: t("slideSpaEyebrow"),
-      title: t("slideSpaTitle"),
-      href: "/spa",
-      linkLabel: t("slideSpaLink"),
-      image:
-        "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=2000&q=80",
-      alt: t("slideSpaImageAlt"),
-    },
-    {
-      key: "sea",
-      eyebrow: t("slideSeaEyebrow"),
-      title: t("slideSeaTitle"),
-      href: "/experiences",
-      linkLabel: t("slideSeaLink"),
-      image:
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80",
-      alt: t("slideSeaImageAlt"),
-    },
-    {
-      key: "dining",
-      eyebrow: t("slideDiningEyebrow"),
-      title: t("slideDiningTitle"),
-      href: "/restaurants",
-      linkLabel: t("slideDiningLink"),
-      image:
-        "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=2000&q=80",
-      alt: t("slideDiningImageAlt"),
-    },
-  ];
+  const slides: Slide[] = useMemo(
+    () => [
+      {
+        key: "sight",
+        sense: t("slideSightSense"),
+        subtitle: t("slideSightSubtitle"),
+        title: t("slideSightTitle"),
+        body: t("slideSightBody"),
+        image: "/index/slide-index/nhin.jpg",
+        alt: t("slideSightImageAlt"),
+        align: "left",
+      },
+      {
+        key: "listen",
+        sense: t("slideListenSense"),
+        subtitle: t("slideListenSubtitle"),
+        title: t("slideListenTitle"),
+        body: t("slideListenBody"),
+        image: "/index/slide-index/lang-nghe.jpg",
+        alt: t("slideListenImageAlt"),
+        align: "right",
+      },
+      {
+        key: "touch",
+        sense: t("slideTouchSense"),
+        subtitle: t("slideTouchSubtitle"),
+        title: t("slideTouchTitle"),
+        body: t("slideTouchBody"),
+        offer: t("slideTouchOffer"),
+        image: "/index/slide-index/cham.png",
+        alt: t("slideTouchImageAlt"),
+        align: "right",
+      },
+      {
+        key: "taste",
+        sense: t("slideTasteSense"),
+        subtitle: t("slideTasteSubtitle"),
+        title: t("slideTasteTitle"),
+        body: t("slideTasteBody"),
+        image: "/index/slide-index/nem.png",
+        alt: t("slideTasteImageAlt"),
+        align: "left",
+      },
+      {
+        key: "scent",
+        sense: t("slideScentSense"),
+        subtitle: t("slideScentSubtitle"),
+        title: t("slideScentTitle"),
+        body: t("slideScentBody"),
+        image: "/index/slide-index/huong.jpg",
+        alt: t("slideScentImageAlt"),
+        align: "left",
+      },
+    ],
+    [t],
+  );
 
   const goTo = useCallback(
     (nextIndex: number) => {
@@ -138,11 +168,13 @@ export function FeatureSlider() {
   };
 
   const active = slides[index];
+  const slideNumber = padSlideIndex(index + 1);
+  const copySideClass = active.align === "right" ? " is-copy-right" : " is-copy-left";
 
   return (
     <section
       ref={rootRef}
-      className={`feature-slider${direction ? ` is-${direction}` : ""}`}
+      className={`feature-slider is-senses${copySideClass}${direction ? ` is-${direction}` : ""}`}
       aria-label={t("sliderAria")}
       aria-roledescription="carousel"
       onMouseEnter={() => setPaused(true)}
@@ -170,15 +202,20 @@ export function FeatureSlider() {
       ))}
 
       <div className="feature-slider-copy">
-        <p className="feature-slider-eyebrow">{active.eyebrow}</p>
+        <p className="feature-slider-sense">
+          <span className="feature-slider-rule" aria-hidden="true" />
+          <span>
+            {slideNumber} - {active.sense}
+          </span>
+        </p>
+        <p className="feature-slider-subtitle">{active.subtitle}</p>
         <h2>{active.title}</h2>
-        <Link
-          className="feature-slider-link"
-          href={active.href}
-          onClick={(event) => event.stopPropagation()}
-        >
-          {active.linkLabel}
-        </Link>
+        <p className="feature-slider-body">{active.body}</p>
+        {active.offer ? <p className="feature-slider-offer">{active.offer}</p> : null}
+        <p className="feature-slider-tagline">
+          <span className="feature-slider-rule" aria-hidden="true" />
+          <span>{t("slideTagline")}</span>
+        </p>
       </div>
 
       <div className="feature-slider-dots" role="tablist" aria-label={t("sliderDotsAria")}>
@@ -211,16 +248,24 @@ export function FeatureSlider() {
       ) : null}
 
       <div className="feature-slider-controls">
-        <button type="button" aria-label={t("sliderPrev")} onClick={(event) => {
-          event.stopPropagation();
-          goPrev();
-        }}>
+        <button
+          type="button"
+          aria-label={t("sliderPrev")}
+          onClick={(event) => {
+            event.stopPropagation();
+            goPrev();
+          }}
+        >
           {t("sliderPrev")}
         </button>
-        <button type="button" aria-label={t("sliderNext")} onClick={(event) => {
-          event.stopPropagation();
-          goNext();
-        }}>
+        <button
+          type="button"
+          aria-label={t("sliderNext")}
+          onClick={(event) => {
+            event.stopPropagation();
+            goNext();
+          }}
+        >
           {t("sliderNext")}
         </button>
       </div>

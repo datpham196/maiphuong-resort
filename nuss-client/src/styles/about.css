@@ -1,0 +1,1249 @@
+/* About / Our Story page */
+
+html {
+  scroll-behavior: smooth;
+}
+
+.about-page {
+  color: var(--text);
+  background: var(--cream);
+  font-family: var(--font-sans), var(--sans), "Noto Sans", sans-serif;
+  /* Clear fixed site header, then leave a bit of air before chapter 01. */
+  padding-top: 112px;
+}
+
+/* Offset in-page anchors for the fixed site header */
+.about-page #location,
+.about-page #beginning,
+.about-page #archive,
+.about-page #journey,
+.about-page #then-now,
+.about-page #today,
+.about-page #values,
+.about-page #closing {
+  scroll-margin-top: 104px;
+}
+.about-page h1,
+.about-page h2,
+.about-page h3 {
+  margin: 0;
+  font-family: var(--font-serif), var(--serif), "Noto Serif", serif;
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  color: var(--deep);
+}
+.about-page p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.87;
+  color: var(--muted);
+}
+.about-page img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.about-page a {
+  color: inherit;
+  text-decoration: none;
+}
+.about-page .lightbox {
+  display: none;
+}
+.about-page .lightbox.is-open,
+.about-page .lightbox.open {
+  display: flex;
+}
+.about-page .archive-card {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+}
+.about-page .timeline-year.is-text {
+  font-size: clamp(42px, 5.2vw, 72px);
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  max-width: none;
+  white-space: nowrap;
+}
+.about-page .location-stat b {
+  letter-spacing: 0;
+  font-family: var(--font-serif), "Noto Serif", "Times New Roman", serif;
+}
+.about-page .founder-photo-1,
+.about-page .founder-photo-2,
+.about-page .compare-item,
+.about-page .tile,
+.about-page .archive-photo,
+.about-page .closing {
+  position: relative;
+}
+.about-page .founder-photo-1 img,
+.about-page .founder-photo-2 img,
+.about-page .compare-item img,
+.about-page .tile img,
+.about-page .archive-photo img,
+.about-page .closing > img {
+  object-fit: cover;
+}
+
+:root{--night:#113844;--deep:#173f49;--aqua:#326c72;--white:#fffefb;--cream:#fbf8f1;--sand:#f2ecdf;--line:#e7dfd2;--text:#263b3d;--muted:#657571;--gold:#c29d62;--gold-light:#e3cfac;--serif:Georgia,"Times New Roman",serif;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;--shadow:0 22px 60px rgba(20,52,53,.13)}
+.about-page .shell{width:min(1360px,calc(100% - 104px));margin:0 auto}.about-page .eyebrow{display:flex;align-items:center;gap:14px;color:var(--gold);font-size:13px;text-transform:uppercase;letter-spacing:.22em;font-weight:600}.about-page .eyebrow:before{content:"";display:block;width:34px;height:1px;background:currentColor}.about-page .eyebrow.on-dark{color:var(--gold-light)}.about-page .eyebrow.centered{justify-content:center}.about-page .eyebrow.centered:after{content:"";display:block;width:34px;height:1px;background:currentColor}.about-page .outline-link{display:inline-flex;gap:23px;align-items:center;justify-content:space-between;width:max-content;min-width:187px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--gold);padding:10px 0 14px;transition:gap .2s,color .2s}.about-page .outline-link:hover{gap:34px;color:var(--gold)}.about-page .line-arrow{width:25px;height:1px;background:currentColor;position:relative;flex:none}.about-page .line-arrow:after{content:"";position:absolute;right:0;top:-4px;width:9px;height:9px;border-right:1px solid currentColor;border-top:1px solid currentColor;transform:rotate(45deg)}
+/* section */
+.about-page .section{padding:115px 0}.about-page .section-light{background:var(--white)}.about-page .section-warm{background:var(--cream)}.about-page .section-sand{background:var(--sand)}.about-page .split{display:grid;grid-template-columns:.87fr 1.13fr;gap:7.5vw;align-items:center}.about-page .narrow-copy h2{margin:21px 0 28px}.about-page .narrow-copy p{max-width:530px;margin-bottom:19px}.about-page .intro-small{font-family:var(--serif);font-size:24px;color:var(--deep);line-height:1.45;margin:0 0 19px}.about-page .map-frame{position:relative;min-height:660px;background:#fffaf2;border-radius:48% 48% 13% 13% / 23% 23% 8% 8%;box-shadow:0 10px 54px #41351a0a;overflow:hidden;display:flex;justify-content:center;align-items:center}.about-page .map-frame img{height:710px;width:auto;object-fit:contain;max-width:100%}.about-page .map-caption{text-align:center;color:#8b8a80;font-size:11px;letter-spacing:.09em;margin-top:13px}.about-page .location-stat{display:flex;gap:32px;margin-top:30px;padding-top:25px;border-top:1px solid var(--line)}.about-page .location-stat div{display:flex;flex-direction:column;gap:7px}.about-page .location-stat b{font:28px var(--serif);color:var(--deep)}.about-page .location-stat span{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#798883}
+/* gallery */
+.about-page .gallery-intro{text-align:center;max-width:770px;margin:0 auto 45px}.about-page .gallery-intro h2{margin:22px 0 18px}.about-page .gallery-intro p{font-size:17px}.about-page .gallery-toolbar{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:17px}.about-page .gallery-toolbar small{font-size:12px;color:var(--muted);letter-spacing:.05em}.about-page .arrow-buttons{display:flex;gap:8px}.about-page .arrow-buttons button{height:44px;width:44px;background:transparent;border:1px solid #c5c7bd;color:var(--deep);font-size:23px;transition:.2s}.about-page .arrow-buttons button:hover{background:var(--deep);color:white}.about-page .gallery-track{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:0 2px 11px}.about-page .gallery-track::-webkit-scrollbar{display:none}.about-page .archive-card{width:clamp(255px,27vw,388px);flex:none;scroll-snap-align:start;cursor:pointer;position:relative}.about-page .archive-photo{height:350px;overflow:hidden;background:#d8d0c2}.about-page .archive-photo img{transition:transform .5s;filter:saturate(.7) contrast(.96)}.about-page .archive-card:hover .archive-photo img{transform:scale(1.045)}.about-page .archive-card .about-page .card-index{font-size:11px;letter-spacing:.2em;color:var(--gold);font-weight:700;margin-top:15px}.about-page .archive-card h3{font:27px var(--serif);margin:6px 0 5px;line-height:1.22}.about-page .archive-card p{font-size:13px;line-height:1.6}.about-page .archive-footer{margin-top:12px;color:#8b8d82;font-size:11px}
+/* timeline */
+.about-page .timeline-head{text-align:center;max-width:760px;margin:0 auto 65px}.about-page .timeline-head h2{margin:20px 0}.about-page .timeline-list{max-width:1120px;margin:auto;position:relative}.about-page .timeline-list:before{content:"";position:absolute;left:50%;top:3px;bottom:3px;width:1px;background:#d4c2a4}.about-page .timeline-row{display:grid;grid-template-columns:1fr 100px 1fr;align-items:center;gap:18px;min-height:190px}.about-page .timeline-row .timeline-node{width:17px;height:17px;background:var(--gold);border:5px solid var(--cream);outline:1px solid var(--gold);border-radius:100%;margin:0 auto;z-index:2;position:relative}.about-page .timeline-row .timeline-year{font:clamp(51px,6vw,88px) var(--serif);letter-spacing:-.045em;color:var(--deep)}.about-page .timeline-row .timeline-year em{font-size:19px;letter-spacing:0;color:var(--gold)}.about-page .timeline-row p{font-size:15px;max-width:410px}.about-page .timeline-row .timeline-left{text-align:right}.about-page .timeline-row .timeline-left p{margin-left:auto}.about-page .timeline-row .timeline-right{text-align:left}.about-page .timeline-row .timeline-right p{margin-right:auto}.about-page .timeline-row .blank{opacity:0;pointer-events:none}
+/* Then and Now */
+.about-page .compare{padding:0;background:#f8f4eb}.about-page .compare-top{padding:105px 0 50px;text-align:center}.about-page .compare-top h2{margin:18px 0 14px}.about-page .compare-top p{max-width:620px;margin:auto}.about-page .compare-grid{display:grid;grid-template-columns:1fr 1fr}.about-page .compare-item{position:relative;height:650px;overflow:hidden;background:var(--deep)}.about-page .compare-item img{transition:transform .6s}.about-page .compare-item:hover img{transform:scale(1.035)}.about-page .compare-item .image-cover{position:absolute;inset:0;background:linear-gradient(180deg,transparent 48%,rgba(4,25,28,.7))}.about-page .compare-item .compare-label{position:absolute;bottom:40px;left:7%;color:#fff;z-index:1}.about-page .compare-item .compare-label span{font-size:11px;letter-spacing:.19em;color:#e9d2ab}.about-page .compare-item .compare-label h3{margin-top:9px;font-size:45px}.about-page .compare-item .compare-label p{color:#dbe5e3;font-size:13px;letter-spacing:.015em;max-width:420px;margin-top:10px}
+/* today */
+.about-page .today-head{display:grid;grid-template-columns:1fr 1fr;gap:7vw;align-items:end;margin-bottom:45px}.about-page .today-head h2{margin:20px 0 0}.about-page .today-head p{max-width:500px}.about-page .today-photos{display:grid;grid-template-columns:1.15fr .85fr 1fr;grid-template-rows:260px 260px;gap:15px}.about-page .today-photos .tile{position:relative;overflow:hidden;min-height:0}.about-page .tile img{transition:transform .6s}.about-page .tile:hover img{transform:scale(1.04)}.about-page .today-photos .tile:first-child{grid-row:span 2}.about-page .today-photos .tile:nth-child(2){grid-column:span 2}.about-page .today-photos .tile:after{content:"";position:absolute;inset:65% 0 0;background:linear-gradient(transparent,rgba(12,34,37,.6))}.about-page .tile .tile-caption{position:absolute;bottom:19px;left:19px;z-index:1;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#fff}
+/* what stays */
+.about-page .values{padding:105px 0;background:#efe7d9}.about-page .values-inner{display:grid;grid-template-columns:.9fr 1.1fr;gap:7vw;align-items:start}.about-page .values h2{margin:18px 0 10px}.about-page .values p{max-width:440px}.about-page .value-list{display:grid;grid-template-columns:1fr;gap:0}.about-page .value{border-bottom:1px solid #cfc6b8;display:flex;align-items:baseline;gap:21px;padding:19px 0}.about-page .value:first-child{border-top:1px solid #cfc6b8}.about-page .value span{font-size:12px;color:#947b55}.about-page .value strong{font:30px var(--serif);color:#244249;font-weight:400;flex:1}.about-page .value small{font-size:12px;color:#687974;max-width:230px;line-height:1.6}
+/* closing */
+.about-page .closing{position:relative;min-height:560px;display:flex;align-items:center;justify-content:center;text-align:center;color:white;background:#123a43;overflow:hidden}.about-page .closing img{position:absolute;inset:0;filter:brightness(.52) saturate(.78)}.about-page .closing:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,31,38,.28),rgba(7,40,45,.52))}.about-page .closing-inner{position:relative;z-index:2;max-width:860px;padding:85px 24px}.about-page .closing-inner h2{font-size:clamp(43px,5.9vw,83px);color:#fff;margin:24px 0}.about-page .closing-inner p{color:#e2e4d8;font-size:16px}/* modal */
+.about-page .lightbox{position:fixed;z-index:90;inset:0;background:rgba(11,28,33,.95);display:none;align-items:center;justify-content:center;padding:62px 80px 92px}.about-page .lightbox.open{display:flex}.about-page .lightbox figure{max-width:1100px;width:100%;height:100%;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}.about-page .lightbox img{width:auto;height:auto;max-height:calc(100% - 50px);max-width:100%;object-fit:contain}.about-page .lightbox figcaption{color:#eef2ed;text-align:center;font-size:15px}.about-page .lightbox button{position:absolute;border:1px solid #d9e2dc88;background:#08232b88;color:white;width:47px;height:47px;font-size:27px}.about-page .lightbox .close{right:25px;top:23px}.about-page .lightbox .prev{left:25px;top:50%}.about-page .lightbox .next{right:25px;top:50%}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+@media(max-width:1020px){.about-page .shell{width:calc(100% - 58px)}.navleft{gap:18px}.navleft a{font-size:11px}.header-line{display:none}.hero-copy{padding-left:5vw;padding-right:4.5vw}.hero{grid-template-columns:50% 50%}.about-page .split{gap:4vw}.about-page .map-frame{min-height:580px}.about-page .map-frame img{height:615px}.about-page .founder-inner{gap:3.5vw}.about-page .founder-visual{height:550px}.about-page .today-photos{grid-template-rows:220px 220px}.about-page .compare-item{height:520px}}
+@media(max-width:760px){.about-page .shell{width:calc(100% - 36px)}.header{height:73px}.header-inner{grid-template-columns:1fr auto 1fr}.navleft a{display:none}.mobile-menu{display:block}.navright{gap:10px}.brand-name{font-size:9.5px}.brand-emblem{font-size:22px}.brand-small{font-size:8px}.lang button{padding:7px 9px}.header-line{display:none}.hero{height:auto;min-height:unset;display:flex;flex-direction:column}.hero-copy{padding:62px 25px 72px;order:2}.hero-copy h1{font-size:clamp(52px,13vw,74px);margin:20px 0}.hero-copy p{font-size:16px}.hero-visual{height:410px;order:1}.hero-history{width:42%;height:45%;left:3%;bottom:-8%;border-width:6px}.hero-stamp{bottom:7%;right:5%}.hero-stamp strong{font-size:34px}.hero-scrolldown{display:none}.since-round{left:25px;bottom:18px}.about-page .section{padding:75px 0}.about-page .split,.about-page .founder-inner,.about-page .today-head,.about-page .values-inner{grid-template-columns:1fr;gap:30px}.about-page .split .about-page .narrow-copy{order:1}.about-page .split .about-page .map-col{order:2}.about-page .narrow-copy h2,.about-page .gallery-intro h2,.about-page .timeline-head h2{font-size:clamp(38px,9.8vw,56px)}.about-page .map-frame{min-height:auto;border-radius:20px}.about-page .map-frame img{height:580px;max-width:100%}.about-page .founder:before{top:0;font-size:160px}.about-page .founder-copy{order:1}.about-page .founder-visual{order:2;height:450px}.about-page .founder-photo-1{left:0;width:78%;height:75%}.about-page .founder-photo-2{width:52%;height:47%}.about-page .founder-bigyear{font-size:106px;margin-bottom:17px}.about-page .archive-note{font-size:10px}.about-page .archive-photo{height:290px}.about-page .archive-card{width:260px}.about-page .timeline-head{margin-bottom:32px}.about-page .timeline-list:before{left:23px}.about-page .timeline-row{grid-template-columns:48px 1fr;min-height:auto;gap:10px;padding:0 0 47px}.about-page .timeline-row .timeline-node{grid-column:1;grid-row:1;margin-left:15px}.about-page .timeline-row .timeline-left,.about-page .timeline-row .timeline-right{grid-column:2;grid-row:1;text-align:left!important}.about-page .timeline-row .timeline-left p{margin-left:0}.about-page .timeline-row .timeline-right p{margin-right:0}.about-page .timeline-row .blank{display:none}.about-page .timeline-row .timeline-year{font-size:60px}.about-page .compare-top{padding:75px 0 35px}.about-page .compare-grid{grid-template-columns:1fr}.about-page .compare-item{height:420px}.about-page .compare-item .compare-label h3{font-size:38px}.about-page .today-photos{grid-template-columns:1fr 1fr;grid-template-rows:250px 220px 220px;gap:9px}.about-page .today-photos .tile:first-child{grid-row:1/span 1;grid-column:span 2}.about-page .today-photos .tile:nth-child(2){grid-column:span 2}.about-page .today-photos .tile:nth-child(3){grid-column:1}.about-page .today-photos .tile:nth-child(4){grid-column:2}.about-page .values{padding:75px 0}.about-page .value{gap:12px}.about-page .value strong{font-size:26px}.about-page .value small{max-width:150px}.about-page .closing{min-height:460px}.about-page .closing-inner h2{font-size:clamp(40px,11vw,64px)}.footer-inner{flex-direction:column;align-items:flex-start}.about-page .lightbox{padding:60px 16px 90px}.about-page .lightbox .prev,.about-page .lightbox .next{bottom:20px;top:auto}.about-page .lightbox .prev{left:calc(50% - 60px)}.about-page .lightbox .next{right:calc(50% - 60px)}.about-page .lightbox .close{right:14px;top:14px}}
+@media(max-width:390px){.hero-visual{height:345px}.about-page .map-frame img{height:510px}.hero-copy h1{font-size:47px}.about-page .archive-card{width:235px}.about-page .archive-photo{height:260px}}
+
+/* Our Story v3: the opening headline is integrated into Chapter 01 / location. */
+.about-page .story-first{
+  min-height: unset;
+  padding: 52px 0 78px;
+  background: linear-gradient(125deg, #fffdf9 15%, #f7f2e9 100%);
+  position: relative;
+}
+.about-page .story-first-grid{
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: clamp(36px, 5.5vw, 88px);
+  align-items: center;
+}
+.about-page .story-first-copy{padding: 12px 0;}
+.about-page .story-first h1{
+  font-size: clamp(42px, 4.6vw, 68px);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  margin: 24px 0 24px;
+  color: var(--deep);
+}
+.about-page .story-first h1 span,
+.about-page .story-first h1 em{display: block;}
+.about-page .story-first h1 em{
+  font-style: italic;
+  color: #927c5e;
+  font-weight: 400;
+  margin-top: 4px;
+}
+.about-page .story-first .intro-small{
+  font-family: var(--font-display), var(--font-serif), Libre Baskerville, Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(22px, 2.05vw, 28px);
+  line-height: 1.48;
+  letter-spacing: -0.015em;
+  max-width: 28em;
+  margin: 0 0 20px;
+  color: #1e3d44;
+}
+.about-page .story-first .narrow-copy > p:not(.eyebrow):not(.intro-small){
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-size: 15.5px;
+  line-height: 1.85;
+  letter-spacing: 0.01em;
+  color: #657571;
+  margin-bottom: 0;
+  max-width: 68ch;
+}
+.about-page .story-first .location-stat{
+  margin-top: 24px;
+  gap: 28px;
+  padding-top: 22px;
+}
+.about-page .story-first .location-stat b{
+  font-size: 24px;
+  letter-spacing: 0;
+  font-family: var(--font-serif), "Noto Serif", "Times New Roman", serif;
+  font-feature-settings: "kern" 1;
+}
+.about-page .story-first-link{margin-top: 22px; color: var(--deep);}
+.about-page .story-first .map-col{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 560px;
+  margin-inline: auto;
+}
+.about-page .story-first .map-frame{
+  width: 100%;
+  max-width: 520px;
+  min-height: 600px;
+  aspect-ratio: auto;
+  border-radius: 48% 48% 14% 14% / 22% 22% 10% 10%;
+  background: #fffaf3;
+  box-shadow: 0 18px 48px rgba(66, 62, 50, 0.08);
+  padding: 32px 26px;
+}
+.about-page .story-first .map-frame img{
+  width: 100%;
+  height: 100%;
+  max-height: 600px;
+  object-fit: contain;
+}
+.about-page .story-first .map-caption{
+  margin-top: 12px;
+  font-size: 11px;
+}
+@media (max-width: 1020px){
+  .about-page .story-first{padding: 40px 0 64px;}
+  .about-page .story-first h1{font-size: clamp(38px, 4.6vw, 56px);}
+  .about-page .story-first .map-col{max-width: 460px;}
+  .about-page .story-first .map-frame{
+    max-width: 440px;
+    min-height: 520px;
+  }
+  .about-page .story-first .map-frame img{max-height: 520px;}
+  .about-page .story-first .location-stat{flex-wrap: wrap; gap: 16px;}
+}
+@media (max-width: 760px){
+  .about-page .story-first{padding: 28px 0 52px;}
+  .about-page .story-first-grid{display: grid; grid-template-columns: 1fr; gap: 28px;}
+  .about-page .story-first-copy{padding: 0;}
+  .about-page .story-first h1{font-size: clamp(34px, 9vw, 44px); margin: 16px 0 18px;}
+  .about-page .story-first .intro-small{
+    font-size: 20px;
+    max-width: none;
+  }
+  .about-page .story-first .narrow-copy > p:not(.eyebrow):not(.intro-small){
+    font-size: 15px;
+    max-width: none;
+  }
+  .about-page .story-first .map-col{max-width: 380px;}
+  .about-page .story-first .map-frame{
+    max-width: 360px;
+    min-height: 460px;
+    border-radius: 40% 40% 16% 16% / 18% 18% 10% 10%;
+    padding: 22px 18px;
+  }
+  .about-page .story-first .map-frame img{max-height: 460px;}
+  .about-page .story-first .location-stat{margin-top: 20px;}
+  .about-page .story-first-link{margin-top: 18px;}
+}
+@media (max-width: 390px){
+  .about-page .story-first h1{font-size: 30px;}
+  .about-page .story-first .map-col{max-width: 300px;}
+  .about-page .story-first .map-frame{
+    max-width: 280px;
+    min-height: 380px;
+  }
+  .about-page .story-first .map-frame img{max-height: 380px;}
+  .about-page .story-first .intro-small{font-size: 18px;}
+}
+
+
+/* Section 02 — The Beginning (match design sample) */
+.about-page .founder {
+  background: var(--deep);
+  color: #fff;
+  overflow: hidden;
+  position: relative;
+  padding: 96px 0;
+}
+.about-page .founder::before {
+  content: "2002";
+  font-family: var(--font-display), var(--font-serif), Libre Baskerville, Georgia, serif;
+  font-size: clamp(180px, 28vw, 420px);
+  font-weight: 700;
+  position: absolute;
+  top: -90px;
+  right: -40px;
+  color: rgba(255, 255, 255, 0.045);
+  line-height: 0.9;
+  pointer-events: none;
+  z-index: 0;
+  letter-spacing: -0.04em;
+}
+.about-page .founder-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: clamp(36px, 5vw, 72px);
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+.about-page .founder-copy {
+  padding: 8px 0;
+}
+.about-page .founder-copy .eyebrow {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: #d4b788;
+}
+.about-page .founder-copy .eyebrow::before {
+  width: 34px;
+  opacity: 0.9;
+}
+.about-page .founder-bigyear {
+  font-family: var(--font-display), var(--font-serif), Libre Baskerville, Georgia, serif;
+  font-size: clamp(88px, 11vw, 156px);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 0.9;
+  color: #e6d3b0;
+  margin: 22px 0 10px;
+}
+.about-page .founder-copy h2 {
+  font-family: var(--font-display), var(--font-serif), Libre Baskerville, Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(32px, 3.6vw, 48px);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin: 0 0 28px;
+  max-width: 11ch;
+}
+.about-page .founder-copy > p:not(.eyebrow):not(.archive-note) {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-weight: 400;
+  color: #dbe3de;
+  margin: 0 0 22px;
+  max-width: none;
+  width: 100%;
+  font-size: 15.5px;
+  line-height: 1.78;
+  letter-spacing: 0.015em;
+}
+.about-page .founder-visual {
+  height: min(620px, 72vh);
+  position: relative;
+}
+.about-page .founder-photo-1 {
+  position: absolute;
+  top: 0;
+  left: 4%;
+  width: 72%;
+  height: 78%;
+  overflow: hidden;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+.about-page .founder-photo-1 img {
+  filter: saturate(0.82) contrast(1.02);
+}
+.about-page .founder-photo-2 {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 52%;
+  height: 46%;
+  border: 10px solid var(--deep);
+  overflow: hidden;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+.about-page .founder-photo-2 img {
+  filter: saturate(0.82);
+}
+.about-page .archive-note {
+  margin-top: 28px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-weight: 400;
+  color: #c9ae7d;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  max-width: none;
+}
+.about-page .archive-note::before {
+  content: "";
+  width: 28px;
+  height: 1px;
+  background: #c9ae7d;
+  flex: none;
+  opacity: 0.85;
+}
+@media (max-width: 1020px) {
+  .about-page .founder {
+    padding: 80px 0;
+  }
+  .about-page .founder-inner {
+    gap: 36px;
+  }
+  .about-page .founder-visual {
+    height: 520px;
+  }
+  .about-page .founder-copy h2 {
+    max-width: 14ch;
+  }
+}
+@media (max-width: 760px) {
+  .about-page .founder {
+    padding: 64px 0;
+  }
+  .about-page .founder::before {
+    top: -20px;
+    font-size: 160px;
+    right: -16px;
+  }
+  .about-page .founder-inner {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .about-page .founder-copy {
+    order: 1;
+  }
+  .about-page .founder-visual {
+    order: 2;
+    height: 420px;
+  }
+  .about-page .founder-photo-1 {
+    left: 0;
+    width: 78%;
+    height: 76%;
+  }
+  .about-page .founder-photo-2 {
+    width: 54%;
+    height: 44%;
+    border-width: 8px;
+  }
+  .about-page .founder-bigyear {
+    font-size: 100px;
+    margin: 16px 0 8px;
+  }
+  .about-page .founder-copy h2 {
+    max-width: none;
+    font-size: clamp(28px, 7.5vw, 38px);
+    margin-bottom: 22px;
+  }
+}
+
+/* Section 03 — From the archives (match design sample) */
+.about-page #archive.section-warm {
+  background: #fbf8f1;
+}
+.about-page .gallery-intro {
+  text-align: center;
+  max-width: 1100px;
+  margin: 0 auto 52px;
+}
+.about-page .gallery-intro .eyebrow {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: #b8965c;
+}
+.about-page .gallery-intro .eyebrow::before,
+.about-page .gallery-intro .eyebrow::after {
+  width: 34px;
+  opacity: 0.85;
+}
+.about-page .gallery-intro h2 {
+  font-family: var(--font-display), var(--font-serif), Libre Baskerville, Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(34px, 4.2vw, 52px);
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: #1e3d44;
+  margin: 18px auto 20px;
+  max-width: 13.5em;
+}
+.about-page .gallery-intro > p {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.85;
+  letter-spacing: 0.01em;
+  color: #6d7873;
+  max-width: 92ch;
+  margin: 0 auto;
+}
+.about-page .gallery-track {
+  align-items: flex-start;
+}
+.about-page .archive-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  height: auto;
+}
+.about-page .archive-photo {
+  position: relative;
+  width: 100%;
+  height: 350px;
+  flex: none;
+  overflow: hidden;
+  background: #d8d0c2;
+}
+.about-page .archive-photo img {
+  object-fit: cover;
+  object-position: center;
+}
+.about-page .gallery-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 18px;
+}
+.about-page .gallery-toolbar small {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #7a857f;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.about-page .arrow-buttons button {
+  height: 42px;
+  width: 42px;
+  background: transparent;
+  border: 1px solid #c5c7bd;
+  color: var(--deep);
+  font-size: 22px;
+  line-height: 1;
+  transition: 0.2s;
+}
+.about-page .archive-card {
+  text-align: left;
+}
+.about-page .archive-card .card-index {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #b8965c;
+  font-weight: 600;
+  margin: 16px 0 0;
+}
+.about-page .archive-card h3 {
+  font-family: var(--font-display), var(--font-serif), Libre Baskerville, Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(22px, 2vw, 28px);
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  color: #1e3d44;
+  margin: 16px 0 6px;
+}
+.about-page .archive-card > p:not(.card-index) {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #7a857f;
+  margin: 0;
+  max-width: 34ch;
+}
+.about-page .archive-footer {
+  margin-top: 18px;
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  color: #8b8d82;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+@media (max-width: 760px) {
+  .about-page .gallery-intro {
+    margin-bottom: 36px;
+  }
+  .about-page .gallery-intro h2 {
+    max-width: none;
+    font-size: clamp(30px, 8vw, 40px);
+  }
+  .about-page .gallery-intro > p {
+    font-size: 14.5px;
+    max-width: none;
+  }
+  .about-page .archive-card h3 {
+    font-size: 24px;
+  }
+}
+
+.about-page .lightbox figcaption {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: #e8ece9;
+  text-align: center;
+  margin: 4px 0 0;
+}
+
+/* Section 04 — Through the years (match design sample) */
+.about-page #journey .timeline-head {
+  text-align: center;
+  max-width: 1100px;
+  margin: 0 auto 72px;
+}
+.about-page #journey .timeline-head .eyebrow {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: #b8965c;
+}
+.about-page #journey .timeline-head .eyebrow::before,
+.about-page #journey .timeline-head .eyebrow::after {
+  width: 34px;
+  opacity: 0.85;
+}
+.about-page #journey .timeline-head h2 {
+  font-family: var(--font-display), var(--font-serif), Libre Baskerville, Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(34px, 4.2vw, 52px);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: #1e3d44;
+  margin: 18px auto 18px;
+  max-width: 14em;
+}
+.about-page #journey .timeline-head > p {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.85;
+  letter-spacing: 0.01em;
+  color: #6d7873;
+  max-width: none;
+  white-space: nowrap;
+  margin: 0 auto;
+  width: max-content;
+  max-width: 100%;
+}
+.about-page #journey .timeline-list {
+  max-width: 1080px;
+  position: relative;
+  padding: 28px 0;
+  overflow: visible;
+}
+.about-page #journey .timeline-list::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -28px;
+  bottom: -28px;
+  width: 1px;
+  background: #c4a574;
+  transform: translateX(-50%);
+  z-index: 0;
+  pointer-events: none;
+}
+.about-page #journey .timeline-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr);
+  gap: 32px;
+  align-items: center;
+  min-height: 240px;
+  position: relative;
+  z-index: 1;
+}
+.about-page #journey .timeline-node {
+  /* Outer gold ring + cream gap + solid gold center (match sample) */
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: #c4a574;
+  border: 4.5px solid #fbf8f1;
+  box-shadow: 0 0 0 1px #c4a574;
+  outline: none;
+  position: relative;
+  z-index: 2;
+  flex: none;
+}
+.about-page #journey .timeline-node::after {
+  display: none;
+}
+.about-page #journey .blank {
+  opacity: 0;
+  pointer-events: none;
+  min-height: 1px;
+}
+.about-page #journey .timeline-left,
+.about-page #journey .timeline-right {
+  min-width: 0;
+}
+.about-page #journey .timeline-year {
+  font-family: var(--font-display), var(--font-serif), Libre Baskerville, Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(52px, 6.2vw, 92px);
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+  color: #1e3d44;
+  margin: 0 0 12px;
+}
+.about-page #journey .timeline-year.is-text {
+  font-weight: 400;
+  font-size: clamp(40px, 4.8vw, 68px);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  max-width: none;
+  white-space: nowrap;
+  margin-bottom: 14px;
+}
+.about-page #journey .timeline-row p {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-weight: 400;
+  font-size: 14.5px;
+  line-height: 1.8;
+  letter-spacing: 0.01em;
+  color: #6d7873;
+  max-width: 34ch;
+  margin: 0;
+}
+.about-page #journey .timeline-left {
+  text-align: right;
+}
+.about-page #journey .timeline-left p {
+  margin-left: auto;
+}
+.about-page #journey .timeline-right {
+  text-align: left;
+}
+.about-page #journey .timeline-right .timeline-year.is-text {
+  margin-right: auto;
+}
+.about-page #journey .timeline-right p {
+  max-width: 46ch;
+}
+@media (max-width: 760px) {
+  .about-page #journey .timeline-head {
+    margin-bottom: 40px;
+  }
+  .about-page #journey .timeline-head h2 {
+    max-width: none;
+    font-size: clamp(30px, 8vw, 40px);
+  }
+  .about-page #journey .timeline-head > p {
+    max-width: none;
+    width: auto;
+    white-space: normal;
+    font-size: 14.5px;
+  }
+  .about-page #journey .timeline-list::before {
+    left: 23px;
+    transform: none;
+  }
+  .about-page #journey .timeline-row {
+    grid-template-columns: 40px 1fr;
+    gap: 14px;
+    min-height: auto;
+    padding: 0 0 48px;
+  }
+  .about-page #journey .timeline-row .blank {
+    display: none;
+  }
+  .about-page #journey .timeline-node {
+    grid-column: 1;
+    grid-row: 1;
+    margin-left: 12px;
+  }
+  .about-page #journey .timeline-left,
+  .about-page #journey .timeline-right {
+    grid-column: 2;
+    grid-row: 1;
+    text-align: left;
+  }
+  .about-page #journey .timeline-left p {
+    margin-left: 0;
+  }
+  .about-page #journey .timeline-year {
+    font-size: clamp(44px, 12vw, 64px);
+  }
+  .about-page #journey .timeline-year.is-text {
+    max-width: none;
+    white-space: normal;
+    font-size: clamp(36px, 9vw, 48px);
+  }
+  .about-page #journey .timeline-row p,
+  .about-page #journey .timeline-right p {
+    max-width: none;
+  }
+}
+
+/* Section 05 — Then & Now (match design sample) */
+.about-page .compare {
+  padding: 0;
+  background: #f8f4eb;
+}
+.about-page .compare-top {
+  padding: 96px 0 52px;
+  text-align: center;
+}
+.about-page .compare-top .eyebrow {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: #b8965c;
+}
+.about-page .compare-top .eyebrow::before,
+.about-page .compare-top .eyebrow::after {
+  width: 34px;
+  opacity: 0.85;
+}
+.about-page .compare-top h2 {
+  font-family: var(--font-display), var(--font-serif), Libre Baskerville, Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(34px, 4.2vw, 52px);
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: #1e3d44;
+  margin: 18px auto 18px;
+  white-space: nowrap;
+  max-width: none;
+}
+.about-page .compare-top > p {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.85;
+  letter-spacing: 0.01em;
+  color: #6d7873;
+  max-width: 62ch;
+  margin: 0 auto;
+}
+.about-page .compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.about-page .compare-item {
+  position: relative;
+  height: min(650px, 72vh);
+  overflow: hidden;
+  background: var(--deep);
+}
+.about-page .compare-item .image-cover {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 42%, rgba(4, 25, 28, 0.72));
+  z-index: 1;
+  pointer-events: none;
+}
+.about-page .compare-item .compare-label {
+  position: absolute;
+  bottom: 40px;
+  left: 7%;
+  right: 7%;
+  color: #fff;
+  z-index: 2;
+}
+.about-page .compare-item .compare-label span {
+  display: block;
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+  color: #e9d2ab;
+}
+.about-page .compare-item .compare-label h3 {
+  font-family: var(--font-display), var(--font-serif), Libre Baskerville, Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(28px, 3.2vw, 44px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin: 10px 0 8px;
+  white-space: nowrap;
+}
+.about-page .compare-item .compare-label p {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  color: #dbe5e3;
+  font-size: 13.5px;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+  max-width: 36ch;
+  margin: 0;
+}
+@media (max-width: 1020px) {
+  .about-page .compare-item {
+    height: 520px;
+  }
+  .about-page .compare-item .compare-label h3 {
+    font-size: clamp(24px, 3vw, 34px);
+  }
+}
+@media (max-width: 760px) {
+  .about-page .compare-top {
+    padding: 72px 0 36px;
+  }
+  .about-page .compare-top h2 {
+    white-space: normal;
+    font-size: clamp(30px, 8vw, 40px);
+  }
+  .about-page .compare-top > p {
+    max-width: none;
+    padding: 0 8px;
+  }
+  .about-page .compare-grid {
+    grid-template-columns: 1fr;
+  }
+  .about-page .compare-item {
+    height: 420px;
+  }
+  .about-page .compare-item .compare-label h3 {
+    white-space: normal;
+    font-size: clamp(26px, 7vw, 34px);
+  }
+}
+
+/* Section 06 — A new chapter (match design sample) */
+.about-page #today.section-light {
+  background: #fffefb;
+}
+.about-page #today .today-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.9fr);
+  gap: clamp(28px, 4.5vw, 64px);
+  align-items: start;
+  margin-bottom: 48px;
+}
+.about-page #today .today-head .eyebrow {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: #b8965c;
+}
+.about-page #today .today-head .eyebrow::before {
+  width: 34px;
+  opacity: 0.85;
+}
+.about-page #today .today-head h2 {
+  /* Noto Serif first: Libre Baskerville has no Vietnamese glyphs */
+  font-family: var(--font-serif), "Noto Serif", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(34px, 4vw, 52px);
+  line-height: 1.25;
+  letter-spacing: 0;
+  color: #1e3d44;
+  margin: 18px 0 0;
+  white-space: pre-line;
+  max-width: 18em;
+  overflow: visible;
+  overflow-wrap: normal;
+  word-break: keep-all;
+  hyphens: none;
+}
+.about-page #today .today-head > p {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-weight: 400;
+  font-size: 15.5px;
+  line-height: 1.8;
+  letter-spacing: 0.01em;
+  color: #657571;
+  max-width: 54ch;
+  width: 100%;
+  margin: 64px 0 0;
+  text-align: left;
+  justify-self: start;
+}
+.about-page #today .today-photos {
+  display: grid;
+  grid-template-columns: 1.15fr 0.925fr 0.925fr;
+  grid-template-rows: minmax(260px, 32vh) minmax(260px, 32vh);
+  gap: 14px;
+}
+.about-page #today .today-photos .tile {
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+  background: #d8d0c2;
+}
+.about-page #today .today-photos .tile:first-child {
+  grid-row: span 2;
+}
+.about-page #today .today-photos .tile:nth-child(2) {
+  grid-column: span 2;
+}
+.about-page #today .today-photos .tile::after {
+  content: "";
+  position: absolute;
+  inset: 55% 0 0;
+  background: linear-gradient(transparent, rgba(12, 34, 37, 0.62));
+  pointer-events: none;
+}
+.about-page #today .tile .tile-caption {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  z-index: 1;
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #fff;
+}
+@media (max-width: 1020px) {
+  .about-page #today .today-photos {
+    grid-template-rows: 220px 220px;
+  }
+}
+@media (max-width: 760px) {
+  .about-page #today .today-head {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    margin-bottom: 32px;
+  }
+  .about-page #today .today-head h2 {
+    max-width: none;
+    font-size: clamp(32px, 8vw, 42px);
+  }
+  .about-page #today .today-head > p {
+    margin: 0;
+    max-width: none;
+  }
+  .about-page #today .today-photos {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 250px 220px 220px;
+    gap: 10px;
+  }
+  .about-page #today .today-photos .tile:first-child {
+    grid-row: 1;
+    grid-column: span 2;
+  }
+  .about-page #today .today-photos .tile:nth-child(2) {
+    grid-column: span 2;
+  }
+}
+
+/* Section — What remains (match design sample) */
+.about-page #values.values {
+  padding: 105px 0;
+  background: #efe7d9;
+}
+.about-page #values .values-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: clamp(40px, 7vw, 96px);
+  align-items: start;
+}
+.about-page #values .eyebrow {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: #b8965c;
+}
+.about-page #values .eyebrow::before {
+  width: 34px;
+  opacity: 0.85;
+}
+.about-page #values h2 {
+  font-family: var(--font-display), var(--font-serif), Libre Baskerville, Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(36px, 4.4vw, 54px);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: #1e3d44;
+  margin: 18px 0 18px;
+  max-width: 10em;
+  white-space: pre-line;
+}
+.about-page #values .values-inner > div:first-child > p:not(.eyebrow) {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.8;
+  letter-spacing: 0.01em;
+  color: #657571;
+  max-width: 36ch;
+  margin: 0;
+}
+.about-page #values .value-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+.about-page #values .value {
+  border-bottom: 1px solid #cfc6b8;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) minmax(140px, 220px);
+  gap: 18px;
+  align-items: baseline;
+  padding: 22px 0;
+}
+.about-page #values .value:first-child {
+  border-top: 1px solid #cfc6b8;
+}
+.about-page #values .value span {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: #947b55;
+}
+.about-page #values .value strong {
+  font-family: var(--font-display), var(--font-serif), Libre Baskerville, Georgia, serif;
+  font-size: clamp(26px, 2.6vw, 34px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: #244249;
+  line-height: 1.15;
+}
+.about-page #values .value small {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #687974;
+  max-width: 22ch;
+  text-align: right;
+  justify-self: end;
+}
+@media (max-width: 760px) {
+  .about-page #values.values {
+    padding: 75px 0;
+  }
+  .about-page #values .values-inner {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .about-page #values h2 {
+    max-width: none;
+    font-size: clamp(32px, 8vw, 42px);
+  }
+  .about-page #values .values-inner > div:first-child > p:not(.eyebrow) {
+    max-width: none;
+  }
+  .about-page #values .value {
+    grid-template-columns: 36px 1fr;
+    gap: 12px 14px;
+    padding: 18px 0;
+  }
+  .about-page #values .value strong {
+    font-size: 26px;
+  }
+  .about-page #values .value small {
+    grid-column: 2;
+    justify-self: start;
+    text-align: left;
+    max-width: none;
+  }
+}
+
+/* Closing section (match design sample) */
+.about-page .closing {
+  position: relative;
+  min-height: 620px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  background: #123a43;
+  overflow: hidden;
+}
+.about-page .closing > img {
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+  filter: brightness(0.48) saturate(0.82);
+}
+.about-page .closing::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 31, 38, 0.35), rgba(7, 40, 45, 0.55));
+  z-index: 1;
+  pointer-events: none;
+}
+.about-page .closing-inner {
+  position: relative;
+  z-index: 2;
+  max-width: min(1100px, calc(100% - 48px));
+  padding: 100px 24px;
+}
+.about-page .closing-inner .eyebrow {
+  font-family: var(--font-sans), "Noto Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: #e3cfac;
+}
+.about-page .closing-inner .eyebrow::before,
+.about-page .closing-inner .eyebrow::after {
+  width: 34px;
+  background: currentColor;
+  opacity: 0.85;
+}
+.about-page .closing-inner h2.closing-quote {
+  font-family: var(--font-display), var(--font-serif), Libre Baskerville, Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(40px, 5.8vw, 78px);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  margin: 28px auto;
+  white-space: pre-line;
+  max-width: 14em;
+  position: relative;
+}
+.about-page .closing-inner h2.closing-quote::before,
+.about-page .closing-inner h2.closing-quote::after {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 0.72em;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.92);
+}
+.about-page .closing-inner h2.closing-quote::before {
+  content: "“";
+  margin-right: 0.08em;
+}
+.about-page .closing-inner h2.closing-quote::after {
+  content: "”";
+  margin-left: 0.08em;
+}
+.about-page .closing-inner .closing-body {
+  font-family: var(--font-display), var(--font-serif), Libre Baskerville, Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(16px, 1.5vw, 20px);
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.92);
+  max-width: none;
+  width: max-content;
+  max-width: 100%;
+  margin: 0 auto;
+  white-space: nowrap;
+}
+.about-page .closing-inner .closing-cta {
+  color: #fff;
+  border-bottom-color: #c29d62;
+  margin: 36px auto 0;
+}
+.about-page .closing-inner .closing-cta:hover {
+  color: #e3cfac;
+  border-bottom-color: #e3cfac;
+}
+@media (max-width: 760px) {
+  .about-page .closing {
+    min-height: 520px;
+  }
+  .about-page .closing-inner {
+    padding: 72px 20px;
+  }
+  .about-page .closing-inner h2.closing-quote {
+    font-size: clamp(34px, 9vw, 48px);
+    max-width: none;
+  }
+  .about-page .closing-inner .closing-body {
+    white-space: normal;
+    width: auto;
+  }
+}

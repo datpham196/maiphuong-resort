@@ -32,6 +32,7 @@ public class RoomSyncService {
 	private final SyncRunRecorder syncRunRecorder;
 	private final NussProperties properties;
 	private final ObjectMapper objectMapper;
+	private final RoomContentSeedService roomContentSeedService;
 
 	public RoomSyncService(
 			OnePmsClient onePmsClient,
@@ -39,7 +40,8 @@ public class RoomSyncService {
 			PmsSyncRunRepository syncRunRepository,
 			SyncRunRecorder syncRunRecorder,
 			NussProperties properties,
-			ObjectMapper objectMapper
+			ObjectMapper objectMapper,
+			RoomContentSeedService roomContentSeedService
 	) {
 		this.onePmsClient = onePmsClient;
 		this.roomTypeRepository = roomTypeRepository;
@@ -47,6 +49,7 @@ public class RoomSyncService {
 		this.syncRunRecorder = syncRunRecorder;
 		this.properties = properties;
 		this.objectMapper = objectMapper;
+		this.roomContentSeedService = roomContentSeedService;
 	}
 
 	@Transactional
@@ -94,6 +97,8 @@ public class RoomSyncService {
 					deactivated++;
 				}
 			}
+
+			roomContentSeedService.applySeeds();
 
 			run.setTotalFetched(snapshot.size());
 			run.setTotalCreated(created);

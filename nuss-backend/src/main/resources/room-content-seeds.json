@@ -1,0 +1,289 @@
+{
+  "DDR": {
+    "displayOrder": 1,
+    "vi": {
+      "slug": "deluxe-double-room",
+      "title": "Deluxe Double Room",
+      "shortDescription": "2 người lớn + 1 trẻ em · 1 giường 1,8 m",
+      "description": "Không gian nghỉ ngơi ấm cúng, thoải mái và gần gũi, phù hợp cho những cặp đôi muốn tận hưởng kỳ nghỉ nhẹ nhàng tại Mai Phương.",
+      "amenities": [
+        "2 người lớn + 1 trẻ em",
+        "1 giường 1,8 m"
+      ]
+    },
+    "en": {
+      "slug": "deluxe-double-room",
+      "title": "Deluxe Double Room",
+      "shortDescription": "2 adults + 1 child · 1 bed 1.8 m",
+      "description": "A cosy and comfortable retreat for couples looking to enjoy a simple, relaxing stay at Mai Phương.",
+      "amenities": [
+        "2 adults + 1 child",
+        "1 bed 1.8 m"
+      ]
+    }
+  },
+  "F2B": {
+    "displayOrder": 2,
+    "vi": {
+      "slug": "two-bedroom-family",
+      "title": "Two Bedroom",
+      "shortDescription": "6 người lớn + 2 trẻ em · 2 phòng ngủ riêng · 3 giường (1.8 m & 1.4 m)",
+      "description": "Với hai phòng ngủ riêng và ba giường, đây là lựa chọn phù hợp cho gia đình đông thành viên hoặc nhóm bạn. Cùng tận hưởng kỳ nghỉ bên nhau mà vẫn có không gian nghỉ ngơi riêng tư.",
+      "amenities": [
+        "6 người lớn + 2 trẻ em",
+        "2 phòng ngủ riêng",
+        "3 giường (1 phòng 1 giường, 1 phòng 2 giường)",
+        "2 giường 1,8 m & 1 giường 1,4 m"
+      ]
+    },
+    "en": {
+      "slug": "two-bedroom-family",
+      "title": "Two Bedroom",
+      "shortDescription": "6 adults + 2 children · 2 separate bedrooms · 3 beds (1.8 m & 1.4 m)",
+      "description": "Featuring two separate bedrooms and three beds, this spacious option is ideal for larger families or groups of friends who want to stay together while enjoying their own space.",
+      "amenities": [
+        "6 adults + 2 children",
+        "2 separate bedrooms",
+        "3 beds (1 room with 1 bed, 1 room with 2 beds)",
+        "2 beds 1.8 m & 1 bed 1.4 m"
+      ]
+    }
+  },
+  "DPS": {
+    "displayOrder": 3,
+    "vi": {
+      "slug": "garden-view-deluxe-double-room",
+      "title": "Deluxe Double Room with Garden View",
+      "shortDescription": "2 người lớn + 1 trẻ em · Tầng trên · Hướng vườn · 1 giường 1,8 m",
+      "description": "Nằm ở tầng trên, căn phòng mở ra góc nhìn xanh mát của khu vườn. Một không gian yên tĩnh để nghỉ ngơi và tận hưởng nhịp sống chậm rãi tại Mai Phương.",
+      "amenities": [
+        "2 người lớn + 1 trẻ em",
+        "Tầng trên",
+        "Hướng vườn",
+        "1 giường 1,8 m"
+      ]
+    },
+    "en": {
+      "slug": "garden-view-deluxe-double-room",
+      "title": "Deluxe Double Room with Garden View",
+      "shortDescription": "2 adults + 1 child · Upper floor · Garden view · 1 bed 1.8 m",
+      "description": "Located on the upper floor, this room overlooks the garden, offering a peaceful setting to unwind and enjoy the slower pace of island life.",
+      "amenities": [
+        "2 adults + 1 child",
+        "Upper floor",
+        "Garden view",
+        "1 bed 1.8 m"
+      ]
+    }
+  },
+  "DFGV": {
+    "displayOrder": 4,
+    "vi": {
+      "slug": "deluxe-family-garden",
+      "title": "Deluxe Family Garden",
+      "shortDescription": "4 người lớn + 2 trẻ em · Hướng vườn · 2 giường 1,8 m",
+      "description": "Không gian nghỉ dưỡng dành cho gia đình, với khung cảnh khu vườn xanh mát ngay bên ngoài. Một nơi thoải mái để cả nhà cùng nghỉ ngơi sau những ngày vui chơi trên đảo.",
+      "amenities": [
+        "4 người lớn + 2 trẻ em",
+        "Hướng vườn",
+        "2 giường 1,8 m"
+      ]
+    },
+    "en": {
+      "slug": "deluxe-family-garden",
+      "title": "Deluxe Family Garden",
+      "shortDescription": "4 adults + 2 children · Garden view · 2 beds 1.8 m",
+      "description": "A comfortable family retreat overlooking lush garden greenery, offering a welcoming space to relax together after a day exploring Phu Quoc.",
+      "amenities": [
+        "4 adults + 2 children",
+        "Garden view",
+        "2 beds 1.8 m"
+      ]
+    }
+  },
+  "DGV": {
+    "displayOrder": 5,
+    "vi": {
+      "slug": "bungalow-garden-view",
+      "title": "Bungalow Garden View",
+      "shortDescription": "2 người lớn + 1 trẻ em · Bungalow riêng biệt · Hướng vườn · 1 giường 1,8 m",
+      "description": "Ẩn mình giữa khu vườn nhiệt đới, bungalow riêng biệt mang đến không gian nghỉ ngơi gần gũi với thiên nhiên. Thức dậy giữa sắc xanh cây lá và tận hưởng một ngày thật thong thả.",
+      "amenities": [
+        "2 người lớn + 1 trẻ em",
+        "Bungalow riêng biệt",
+        "Hướng vườn",
+        "1 giường 1,8 m"
+      ]
+    },
+    "en": {
+      "slug": "bungalow-garden-view",
+      "title": "Bungalow Garden View",
+      "shortDescription": "2 adults + 1 child · Private bungalow · Garden view · 1 bed 1.8 m",
+      "description": "Nestled among tropical greenery, this private bungalow offers a peaceful escape close to nature. Wake up to garden views and enjoy the simple pleasure of a slow island morning.",
+      "amenities": [
+        "2 adults + 1 child",
+        "Private bungalow",
+        "Garden view",
+        "1 bed 1.8 m"
+      ]
+    }
+  },
+  "DSV": {
+    "displayOrder": 6,
+    "vi": {
+      "slug": "bungalow-sea-view",
+      "title": "Bungalow Sea View",
+      "shortDescription": "2 người lớn + 1 trẻ em · Bungalow riêng biệt · Hướng biển & hồ bơi · 1 giường 1,8 m",
+      "description": "Một bungalow riêng biệt với tầm nhìn hướng biển Vũng Bầu, nơi bạn có thể thảnh thơi ngắm mặt nước và cảm nhận làn gió biển dịu nhẹ ngay trong kỳ nghỉ của mình.",
+      "amenities": [
+        "2 người lớn + 1 trẻ em",
+        "Bungalow riêng biệt",
+        "Hướng biển & hồ bơi",
+        "1 giường 1,8 m"
+      ]
+    },
+    "en": {
+      "slug": "bungalow-sea-view",
+      "title": "Bungalow Sea View",
+      "shortDescription": "2 adults + 1 child · Private bungalow · Sea & pool view · 1 bed 1.8 m",
+      "description": "A private bungalow overlooking Vung Bau Beach, where you can take in calming sea views and enjoy the gentle ocean breeze throughout your stay.",
+      "amenities": [
+        "2 adults + 1 child",
+        "Private bungalow",
+        "Sea & pool view",
+        "1 bed 1.8 m"
+      ]
+    }
+  },
+  "TGV": {
+    "displayOrder": 7,
+    "vi": {
+      "slug": "triple-bungalow-garden-view",
+      "title": "Triple Bungalow Garden View",
+      "shortDescription": "3 người lớn + 1 trẻ em · Bungalow riêng biệt · Hướng vườn · giường 1,8 m & 1,4 m",
+      "description": "Bungalow riêng biệt giữa những khoảng xanh nhiệt đới, phù hợp cho nhóm ba người hoặc gia đình nhỏ. Không gian gần gũi, yên bình để cùng tận hưởng kỳ nghỉ tại Mai Phương.",
+      "amenities": [
+        "3 người lớn + 1 trẻ em",
+        "Bungalow riêng biệt",
+        "Hướng vườn",
+        "Giường 1,8 m & 1,4 m"
+      ]
+    },
+    "en": {
+      "slug": "triple-bungalow-garden-view",
+      "title": "Triple Bungalow Garden View",
+      "shortDescription": "3 adults + 1 child · Private bungalow · Garden view · beds 1.8 m & 1.4 m",
+      "description": "A private bungalow surrounded by tropical gardens, ideal for three guests or a small family seeking a quiet and comfortable island escape.",
+      "amenities": [
+        "3 adults + 1 child",
+        "Private bungalow",
+        "Garden view",
+        "Beds 1.8 m & 1.4 m"
+      ]
+    }
+  },
+  "TSV": {
+    "displayOrder": 8,
+    "vi": {
+      "slug": "triple-bungalow-sea-view",
+      "title": "Triple Bungalow Sea View",
+      "shortDescription": "3 người lớn + 1 trẻ em · Bungalow riêng biệt · Hướng biển · giường 1,8 m & 1,4 m",
+      "description": "Dành cho ba người cùng tận hưởng những ngày nghỉ bên biển, bungalow riêng biệt sở hữu tầm nhìn hướng Vũng Bầu, mang đến cảm giác thư thái giữa thiên nhiên.",
+      "amenities": [
+        "3 người lớn + 1 trẻ em",
+        "Bungalow riêng biệt",
+        "Hướng biển",
+        "Giường 1,8 m & 1,4 m"
+      ]
+    },
+    "en": {
+      "slug": "triple-bungalow-sea-view",
+      "title": "Triple Bungalow Sea View",
+      "shortDescription": "3 adults + 1 child · Private bungalow · Sea view · beds 1.8 m & 1.4 m",
+      "description": "Designed for three guests, this private sea-view bungalow offers a relaxed setting to enjoy the coastal scenery and peaceful atmosphere of Vung Bau.",
+      "amenities": [
+        "3 adults + 1 child",
+        "Private bungalow",
+        "Sea view",
+        "Beds 1.8 m & 1.4 m"
+      ]
+    }
+  },
+  "FBC": {
+    "displayOrder": 9,
+    "vi": {
+      "slug": "family-bungalow",
+      "title": "Family Bungalow Courtyard View",
+      "shortDescription": "4 người lớn + 2 trẻ em · Hướng sân trong · Dọc lối đi rợp bóng cây · 2 giường 1,8 m",
+      "description": "Nằm dọc những lối đi rợp bóng cây trong khuôn viên resort, bungalow mang đến không gian nghỉ dưỡng gần gũi, thuận tiện cho cả gia đình cùng tận hưởng những ngày nghỉ bên nhau.",
+      "amenities": [
+        "4 người lớn + 2 trẻ em",
+        "Hướng sân trong",
+        "Dọc lối đi rợp bóng cây",
+        "2 giường 1,8 m"
+      ]
+    },
+    "en": {
+      "slug": "family-bungalow",
+      "title": "Family Bungalow Courtyard View",
+      "shortDescription": "4 adults + 2 children · Courtyard view · Along tree-lined pathways · 2 beds 1.8 m",
+      "description": "Set along the resort's tree-lined pathways, this family bungalow offers a welcoming courtyard setting for spending relaxing days together.",
+      "amenities": [
+        "4 adults + 2 children",
+        "Courtyard view",
+        "Along tree-lined pathways",
+        "2 beds 1.8 m"
+      ]
+    }
+  },
+  "FGV": {
+    "displayOrder": 10,
+    "vi": {
+      "slug": "family-bungalow-garden-view",
+      "title": "Family Bungalow Garden View",
+      "shortDescription": "4 người lớn + 2 trẻ em · Hướng vườn · 2 giường 1,8 m",
+      "description": "Giữa khu vườn xanh mát, bungalow dành cho gia đình mang đến không gian nghỉ ngơi gần gũi với thiên nhiên, nơi cả nhà có thể cùng thư giãn và tận hưởng nhịp sống bình yên.",
+      "amenities": [
+        "4 người lớn + 2 trẻ em",
+        "Hướng vườn",
+        "2 giường 1,8 m"
+      ]
+    },
+    "en": {
+      "slug": "family-bungalow-garden-view",
+      "title": "Family Bungalow Garden View",
+      "shortDescription": "4 adults + 2 children · Garden view · 2 beds 1.8 m",
+      "description": "Surrounded by lush garden views, this family bungalow offers a comfortable, nature-inspired setting for slowing down and enjoying quality time together.",
+      "amenities": [
+        "4 adults + 2 children",
+        "Garden view",
+        "2 beds 1.8 m"
+      ]
+    }
+  },
+  "FSV": {
+    "displayOrder": 11,
+    "vi": {
+      "slug": "family-bungalow-sea-view",
+      "title": "Family Bungalow Sea View",
+      "shortDescription": "4 người lớn + 2 trẻ em · Hướng biển · 2 giường 1,8 m",
+      "description": "Không gian nghỉ dưỡng hướng biển dành cho gia đình, nơi những ngày nghỉ trôi qua cùng khung cảnh Vũng Bầu yên ả. Cùng nhau ngắm biển, nghỉ ngơi và tận hưởng những khoảnh khắc đáng nhớ.",
+      "amenities": [
+        "4 người lớn + 2 trẻ em",
+        "Hướng biển",
+        "2 giường 1,8 m"
+      ]
+    },
+    "en": {
+      "slug": "family-bungalow-sea-view",
+      "title": "Family Bungalow Sea View",
+      "shortDescription": "4 adults + 2 children · Sea view · 2 beds 1.8 m",
+      "description": "A family retreat overlooking the peaceful waters of Vung Bau, offering a relaxing seaside setting to unwind, reconnect, and share memorable moments together.",
+      "amenities": [
+        "4 adults + 2 children",
+        "Sea view",
+        "2 beds 1.8 m"
+      ]
+    }
+  }
+}

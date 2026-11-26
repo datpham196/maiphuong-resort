@@ -23,6 +23,8 @@ type BookingBarProps = {
   onSearch?: (values: BookingSearchValues) => void;
 };
 
+type DateFocus = "checkIn" | "checkOut";
+
 function toInputDate(date: Date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -32,12 +34,6 @@ function toInputDate(date: Date) {
 
 function parseInputDate(value: string) {
   return new Date(`${value}T12:00:00`);
-}
-
-function addDays(date: Date, days: number) {
-  const next = new Date(date);
-  next.setDate(next.getDate() + days);
-  return next;
 }
 
 function addMonths(date: Date, months: number) {
@@ -58,21 +54,29 @@ function sameDay(a: Date, b: Date) {
   );
 }
 
-const VI_WEEKDAYS = ["Chủ Nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
-const EN_WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const VI_MONTHS = [
-  "tháng 1",
-  "tháng 2",
-  "tháng 3",
-  "tháng 4",
-  "tháng 5",
-  "tháng 6",
-  "tháng 7",
-  "tháng 8",
-  "tháng 9",
-  "tháng 10",
-  "tháng 11",
-  "tháng 12",
+function formatDdMmYyyy(value: string) {
+  if (!value) {
+    return "";
+  }
+  const date = parseInputDate(value);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${day}/${month}/${date.getFullYear()}`;
+}
+
+const VI_MONTH_TITLES = [
+  "Tháng Một",
+  "Tháng Hai",
+  "Tháng Ba",
+  "Tháng Tư",
+  "Tháng Năm",
+  "Tháng Sáu",
+  "Tháng Bảy",
+  "Tháng Tám",
+  "Tháng Chín",
+  "Tháng Mười",
+  "Tháng Mười Một",
+  "Tháng Mười Hai",
 ];
 const EN_MONTHS = [
   "January",
@@ -88,40 +92,11 @@ const EN_MONTHS = [
   "November",
   "December",
 ];
-const VI_MONTH_TITLES = [
-  "Tháng Một",
-  "Tháng Hai",
-  "Tháng Ba",
-  "Tháng Tư",
-  "Tháng Năm",
-  "Tháng Sáu",
-  "Tháng Bảy",
-  "Tháng Tám",
-  "Tháng Chín",
-  "Tháng Mười",
-  "Tháng Mười Một",
-  "Tháng Mười Hai",
-];
-
-/** Deterministic labels — avoids SSR/CSR Intl weekday mismatch (e.g. "Th 6" vs "Thứ 6"). */
-function formatStayDate(value: string, locale: string) {
-  if (!value) {
-    return "—";
-  }
-
-  const date = parseInputDate(value);
-  if (locale === "vi") {
-    return `${VI_WEEKDAYS[date.getDay()]}, ${date.getDate()} ${VI_MONTHS[date.getMonth()]}, ${date.getFullYear()}`;
-  }
-
-  return `${EN_WEEKDAYS[date.getDay()]}, ${EN_MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
-}
 
 function formatMonthTitle(date: Date, locale: string) {
   if (locale === "vi") {
     return `${VI_MONTH_TITLES[date.getMonth()]} ${date.getFullYear()}`.toUpperCase();
   }
-
   return `${EN_MONTHS[date.getMonth()]} ${date.getFullYear()}`.toUpperCase();
 }
 
@@ -146,6 +121,23 @@ function buildMonthCells(monthDate: Date) {
   return cells;
 }
 
+function CalendarIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M8 3v4M16 3v4M3 10h18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ChevronIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function BookingBar({
   initialCheckIn = "",
   initialCheckOut = "",
@@ -167,6 +159,7 @@ export function BookingBar({
   const [adults, setAdults] = useState(initialAdults);
   const [children, setChildren] = useState(initialChildren);
   const [datesOpen, setDatesOpen] = useState(false);
+  const [dateFocus, setDateFocus] = useState<DateFocus>("checkIn");
   const [guestsOpen, setGuestsOpen] = useState(false);
   const [viewMonth, setViewMonth] = useState<Date | null>(null);
 
@@ -228,6 +221,12 @@ export function BookingBar({
 
   const weekdayLabels = t.raw("weekdays") as string[];
 
+  function openDates(focus: DateFocus) {
+    setDateFocus(focus);
+    setDatesOpen(true);
+    setGuestsOpen(false);
+  }
+
   const onSelectDay = (date: Date) => {
     if (today && isPastDay(date, today)) {
       return;
@@ -235,9 +234,16 @@ export function BookingBar({
 
     const value = toInputDate(date);
 
-    if (!checkIn || (checkIn && checkOut) || value < checkIn) {
+    if (dateFocus === "checkOut" && checkIn && value > checkIn) {
+      setCheckOut(value);
+      setDatesOpen(false);
+      return;
+    }
+
+    if (!checkIn || (checkIn && checkOut) || value < checkIn || dateFocus === "checkIn") {
       setCheckIn(value);
       setCheckOut("");
+      setDateFocus("checkOut");
       return;
     }
 
@@ -252,12 +258,13 @@ export function BookingBar({
   const clearDates = () => {
     setCheckIn("");
     setCheckOut("");
+    setDateFocus("checkIn");
   };
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!checkIn || !checkOut) {
-      setDatesOpen(true);
+      openDates(checkIn ? "checkOut" : "checkIn");
       return;
     }
 
@@ -286,35 +293,46 @@ export function BookingBar({
 
   return (
     <form ref={rootRef} className="booking-bar" onSubmit={onSubmit} aria-label={t("aria")}>
-      <div className={`booking-field booking-dates${datesOpen ? " is-open" : ""}`}>
-        <button
-          type="button"
-          className="booking-dates-trigger"
-          aria-expanded={datesOpen}
-          aria-controls="date-panel"
-          onClick={() => {
-            setDatesOpen((value) => !value);
-            setGuestsOpen(false);
-          }}
-        >
-          <span className="booking-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none">
-              <rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.6" />
-              <path d="M8 3v4M16 3v4M3 10h18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-            </svg>
-          </span>
-          <span className={`booking-value${!checkIn ? " is-placeholder" : ""}`}>
-            {checkIn ? (
-              <>
-                {formatStayDate(checkIn, locale)}
-                <span aria-hidden="true"> → </span>
-                {checkOut ? formatStayDate(checkOut, locale) : t("selectCheckout")}
-              </>
-            ) : (
-              t("selectDates")
-            )}
-          </span>
-        </button>
+      <div className={`booking-dates-group${datesOpen ? " is-open" : ""}`}>
+        <div className="booking-field booking-checkin">
+          <button
+            type="button"
+            className="booking-field-trigger"
+            aria-expanded={datesOpen && dateFocus === "checkIn"}
+            aria-controls="date-panel"
+            onClick={() => openDates("checkIn")}
+          >
+            <span className="booking-field-copy">
+              <span className="booking-label">{t("checkIn")}</span>
+              <span className={`booking-value${!checkIn ? " is-placeholder" : ""}`}>
+                {checkIn ? formatDdMmYyyy(checkIn) : t("datePlaceholder")}
+              </span>
+            </span>
+            <span className="booking-icon" aria-hidden="true">
+              <CalendarIcon />
+            </span>
+          </button>
+        </div>
+
+        <div className="booking-field booking-checkout">
+          <button
+            type="button"
+            className="booking-field-trigger"
+            aria-expanded={datesOpen && dateFocus === "checkOut"}
+            aria-controls="date-panel"
+            onClick={() => openDates("checkOut")}
+          >
+            <span className="booking-field-copy">
+              <span className="booking-label">{t("checkOut")}</span>
+              <span className={`booking-value${!checkOut ? " is-placeholder" : ""}`}>
+                {checkOut ? formatDdMmYyyy(checkOut) : t("datePlaceholder")}
+              </span>
+            </span>
+            <span className="booking-icon" aria-hidden="true">
+              <CalendarIcon />
+            </span>
+          </button>
+        </div>
 
         {datesOpen && viewMonth && today ? (
           <div id="date-panel" className="date-panel">
@@ -394,7 +412,7 @@ export function BookingBar({
       <div className="booking-field booking-guests">
         <button
           type="button"
-          className="booking-guests-trigger"
+          className="booking-field-trigger"
           aria-expanded={guestsOpen}
           aria-controls="guest-panel"
           onClick={() => {
@@ -402,18 +420,13 @@ export function BookingBar({
             setDatesOpen(false);
           }}
         >
-          <span className="booking-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.6" />
-              <path
-                d="M5.5 19.2c1.4-3 3.6-4.5 6.5-4.5s5.1 1.5 6.5 4.5"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
-            </svg>
+          <span className="booking-field-copy">
+            <span className="booking-label">{t("guests")}</span>
+            <span className="booking-value">{t("guestSummary", { adults, children })}</span>
           </span>
-          <span className="booking-value">{t("guestSummary", { adults, children })}</span>
+          <span className="booking-icon is-chevron" aria-hidden="true">
+            <ChevronIcon />
+          </span>
         </button>
 
         {guestsOpen ? (
@@ -468,10 +481,7 @@ export function BookingBar({
 
       <button type="submit" className="booking-search">
         <span>{submitLabel ?? t("search")}</span>
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.8" />
-          <path d="M16.5 16.5L21 21" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-        </svg>
+        <span aria-hidden="true">→</span>
       </button>
     </form>
   );
